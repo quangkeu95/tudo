@@ -1,0 +1,24 @@
+[workspace]
+members = ["crates/*"]
+resolver = "2"
+default-members = ["crates/cli"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.65"
+authors = ["Quang Nguyen <quangkeu95@gmail.com>"]
+license = "MIT OR Apache-2.0"
+homepage = "https://github.com/quangkeu95/tudo"
+repository = "https://github.com/quangkeu95/tudo"
+# exclude = ["benches/", "tests/"]
+
+[workspace.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[workspace.dependencies]
+tudo-interpreter = { version = "0.1.0", path = "crates/interpreter" }
+tudo-cli = { version = "0.1.0", path = "crates/cli"}
