@@ -7,3 +7,20 @@ license.workspace = true
 homepage.workspace = true
 repository.workspace = true
 
+[dependencies]
+# internal
+tudo-common = { workspace = true }
+
+# format
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml = "0.9.25"
+serde-enum-str = "0.3"
+
+# misc
+eyre = { workspace = true }
+derive_more = "0.99.17"
+thiserror = "1.0.44"
+
+[dev-dependencies]
+claims = { version = "0.7" }

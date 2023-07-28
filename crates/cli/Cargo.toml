@@ -11,11 +11,24 @@ repository.workspace = true
 name = "tudo"
 path = "src/tudo.rs"
 
+[build-dependencies]
+vergen = { version = "8", default-features = false, features = ["build", "git", "git2"] }
+
 [dependencies]
+#internal
+tudo-config = { workspace = true }
+tudo-interpreter = { workspace = true }
 
 #cli
-clap = { version = "4", features = ["derive", "env", "unicode", "wrap_help"] }
-color-eyre = "0.6.2"
+clap = { version = "4", features = ["derive", "env", "cargo", "unicode", "wrap_help"] }
+tracing-error = "0.2"
+tracing-subscriber = { version = "0.3", features = ["registry", "env-filter", "fmt"] }
+tracing = "0.1"
+owo-colors = { version = "3.5", features = ["supports-colors"]}
+
+# misc
 dotenvy = "0.15.7"
-eyre = "0.6.8"
+color-eyre = { workspace = true }
+eyre = { workspace = true }
+serde = { workspace = true }
 

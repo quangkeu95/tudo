@@ -1,5 +1,5 @@
 [package]
-name = "tudo-config"
+name = "tudo-common"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -8,4 +8,4 @@ homepage.workspace = true
 repository.workspace = true
 
 [dependencies]
-eyre = { workspace = true }
+hashbrown = "0.14.0"
