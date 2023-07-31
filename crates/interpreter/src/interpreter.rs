@@ -1,5 +1,5 @@
 use std::{fs::File, io::Read, path::PathBuf};
-use tudo_common::WorkflowCompose;
+use tudo_primitives::WorkflowCompose;
 
 use crate::types::config::WorkflowComposeConfig;
 

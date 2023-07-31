@@ -2,7 +2,7 @@ use derive_more::Deref;
 use serde::Deserialize;
 use serde_enum_str::Deserialize_enum_str;
 use std::collections::HashMap;
-use tudo_common::WorkflowCompose;
+use tudo_primitives::WorkflowCompose;
 
 /// Workflow file configuration mapping
 #[derive(Debug, Deserialize)]

@@ -1,5 +1,5 @@
 [package]
-name = "tudo-interpreter"
+name = "tudo-executor"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -10,17 +10,14 @@ repository.workspace = true
 [dependencies]
 # internal
 tudo-primitives = { workspace = true }
-
-# format
-serde = { workspace = true }
-serde_json = { workspace = true }
-serde_yaml = "0.9.25"
-serde-enum-str = "0.3"
+ethers = { workspace = true }
 
 # misc
-eyre = { workspace = true }
+async-trait = { workspace = true }
 thiserror = { workspace = true }
-derive_more = "0.99.17"
+tokio = { workspace = true }
+derive_builder = "0.12.0"
 
 [dev-dependencies]
 claims = { version = "0.7" }
+
