@@ -5,6 +5,7 @@ use ethers::types::{BlockId, Bytes, TransactionRequest, H160};
 use thiserror::Error;
 use tudo_primitives::Step;
 
+/// CallContract which implements [`Step`] trait to call contract and return [`Bytes`] data or ABI decoded return data.
 #[derive(Debug)]
 pub struct CallContract<M>
 where
@@ -17,6 +18,7 @@ impl<M> CallContract<M>
 where
     M: Middleware,
 {
+    /// Constructor to create [`CallContract`] instance
     pub fn new(middleware: M) -> Self {
         Self { middleware }
     }
@@ -50,6 +52,7 @@ where
     }
 }
 
+/// CallContract input parameters to execute call to read value from a contract
 #[derive(Debug, Builder)]
 pub struct CallContractInput {
     pub contract_address: H160,
@@ -61,7 +64,7 @@ pub struct CallContractInput {
 }
 
 impl CallContractInput {
-    /// Build raw calldata in [Bytes] from function signature and args
+    /// Build raw calldata in [`Bytes`] from function signature and args
     ///
     /// # Example
     /// ```rust
@@ -95,12 +98,14 @@ impl CallContractInput {
     }
 }
 
+/// CallContract output which in [`Bytes`] or [`Vec<Token>`]
 #[derive(Debug)]
 pub enum CallContractOutput {
     Bytes(Bytes),
     Tokens(Vec<Token>),
 }
 
+/// CallContract error
 #[derive(Debug, Error)]
 pub enum CallContractError<M>
 where
@@ -114,7 +119,6 @@ where
 
 #[cfg(test)]
 mod tests {
-    use claims::*;
     use ethers::{
         abi::ParamType,
         prelude::*,
