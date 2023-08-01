@@ -1,5 +1,5 @@
 use derive_builder::Builder;
-use ethers::abi::Token;
+use ethers::abi::{ParamType, Token};
 use ethers::prelude::Middleware;
 use ethers::types::{BlockId, Bytes, TransactionRequest, H160};
 use thiserror::Error;
@@ -28,19 +28,25 @@ where
     M: Middleware,
 {
     type Input = CallContractInput;
-    type Output = Bytes;
+    type Output = CallContractOutput;
     type Error = CallContractError<M>;
 
     async fn execute(&self, input: &Self::Input) -> Result<Self::Output, Self::Error> {
         let tx_request = TransactionRequest::new()
             .to(input.contract_address)
             .data(input.calldata.clone());
-        let result = self
+        let bytes_result = self
             .middleware
             .call(&tx_request.into(), input.block)
             .await
             .map_err(|e| CallContractError::MiddlewareError(e))?;
-        Ok(result)
+
+        if let Some(return_data_types) = &input.return_data_types {
+            let decoded_return_data = ethers::abi::decode(return_data_types, &bytes_result)?;
+            Ok(CallContractOutput::Tokens(decoded_return_data))
+        } else {
+            Ok(CallContractOutput::Bytes(bytes_result))
+        }
     }
 }
 
@@ -50,6 +56,8 @@ pub struct CallContractInput {
     pub calldata: Bytes,
     #[builder(default)]
     pub block: Option<BlockId>,
+    #[builder(default)]
+    pub return_data_types: Option<Vec<ParamType>>,
 }
 
 impl CallContractInput {
@@ -87,6 +95,12 @@ impl CallContractInput {
     }
 }
 
+#[derive(Debug)]
+pub enum CallContractOutput {
+    Bytes(Bytes),
+    Tokens(Vec<Token>),
+}
+
 #[derive(Debug, Error)]
 pub enum CallContractError<M>
 where
@@ -94,6 +108,8 @@ where
 {
     #[error("Middleware error {0}")]
     MiddlewareError(M::Error),
+    #[error(transparent)]
+    AbiError(#[from] ethers::abi::Error),
 }
 
 #[cfg(test)]
@@ -127,7 +143,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn can_execute_call_contract() {
+    async fn can_execute_call_contract_and_return_bytes() {
         let rpc_url = "https://eth.llamarpc.com";
         let provider = Provider::try_from(rpc_url).unwrap();
         // uniswap v3 swap router 02
@@ -146,14 +162,56 @@ mod tests {
             .unwrap();
         let return_data = call_contract_step.execute(&input).await.unwrap();
 
-        let result = ethers::abi::decode(&vec![ParamType::Address], &return_data).unwrap();
-        let result = result[0].to_owned().into_address();
-        assert_some!(result);
-        assert_eq!(
-            result.unwrap(),
-            "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
-                .parse::<H160>()
-                .unwrap()
-        );
+        match return_data {
+            CallContractOutput::Bytes(b) => {
+                assert_eq!(
+                    b,
+                    Bytes::from_str(
+                        "0x000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+                    )
+                    .unwrap()
+                );
+            }
+            _ => {
+                panic!("invalid return data");
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn can_execute_call_contract_and_decode_return_data() {
+        let rpc_url = "https://eth.llamarpc.com";
+        let provider = Provider::try_from(rpc_url).unwrap();
+        // uniswap v3 swap router 02
+        let contract_address = "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45"
+            .parse::<H160>()
+            .unwrap();
+
+        let calldata = CallContractInput::build_calldata("WETH9()", &vec![]);
+
+        let call_contract_step = CallContract::new(provider);
+
+        let input = CallContractInputBuilder::default()
+            .contract_address(contract_address)
+            .calldata(calldata)
+            .return_data_types(Some(vec![ParamType::Address]))
+            .build()
+            .unwrap();
+        let return_data = call_contract_step.execute(&input).await.unwrap();
+
+        match return_data {
+            CallContractOutput::Tokens(tokens) => {
+                let expected_data = vec![Token::Address(
+                    "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+                        .parse::<H160>()
+                        .unwrap(),
+                )];
+
+                assert_eq!(tokens, expected_data);
+            }
+            _ => {
+                panic!("invalid return data");
+            }
+        }
     }
 }
