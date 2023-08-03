@@ -9,5 +9,6 @@ repository.workspace = true
 
 [dependencies]
 async-trait = "0.1.72"
+auto_impl = "1.1.0"
 eyre = { workspace = true }
 hashbrown = "0.14.0"

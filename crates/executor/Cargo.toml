@@ -16,7 +16,10 @@ ethers = { workspace = true }
 async-trait = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
+eyre = { workspace = true }
+enum_dispatch = { workspace = true }
 derive_builder = "0.12.0"
+derive_more = "0.99"
 
 [dev-dependencies]
 claims = { version = "0.7" }
