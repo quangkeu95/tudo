@@ -7,7 +7,7 @@ lazy_static! {
     static ref UINT_REGEX: Regex = Regex::new("^uint(8|16|24|32|40|48|56|64|72|80|88|96|104|112|120|128|136|144|152|160|168|176|184|192|200|208|216|224|232|240|248|256)?$").unwrap();
     static ref INT_REGEX: Regex = Regex::new("^int(8|16|24|32|40|48|56|64|72|80|88|96|104|112|120|128|136|144|152|160|168|176|184|192|200|208|216|224|232|240|248|256)?$").unwrap();
     static ref BYTES_REGEX: Regex = Regex::new("^bytes([1-9]|1[0-9]|2[0-9]|30|31|32)$").unwrap();
-    static ref ARRAY_REGEX: Regex = Regex::new(r#"^(.*)(\[\d?\])$"#).unwrap();
+    static ref ARRAY_REGEX: Regex = Regex::new(r#"^(.*)(\[\d*\])$"#).unwrap();
     static ref TUPLE_REGEX: Regex = Regex::new(r#"^\(.*\)$"#).unwrap();
 }
 
@@ -278,6 +278,21 @@ mod tests {
                     );
                 }
                 _ => panic!("cannot parse bytes8[][5]"),
+            }
+        }
+        {
+            let array: SolidityTypes = serde_yaml::from_str("(string, address)[]").unwrap();
+            match array {
+                SolidityTypes::Array(root_type) => {
+                    assert_eq!(
+                        root_type,
+                        Box::new(SolidityTypes::Tuple(vec![
+                            SolidityTypes::String,
+                            SolidityTypes::Address
+                        ]))
+                    );
+                }
+                _ => panic!("cannot parse (string, address)[]"),
             }
         }
     }
