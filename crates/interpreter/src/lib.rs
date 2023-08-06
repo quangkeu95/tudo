@@ -2,4 +2,5 @@
 
 mod interpreter;
 pub use interpreter::*;
+pub mod step;
 pub mod types;

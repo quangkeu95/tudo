@@ -10,6 +10,9 @@ repository.workspace = true
 [dependencies]
 # internal
 tudo-primitives = { workspace = true }
+ethers = { workspace = true }
+
+alloy-sol-type-parser = { version = "0.3" }
 
 # format
 serde = { workspace = true }
@@ -21,6 +24,8 @@ serde-enum-str = "0.3"
 eyre = { workspace = true }
 thiserror = { workspace = true }
 derive_more = "0.99.17"
+lazy_static = "1.4"
+regex = "1.9"
 
 [dev-dependencies]
 claims = { version = "0.7" }
