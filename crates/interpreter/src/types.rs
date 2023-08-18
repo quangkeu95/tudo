@@ -6,5 +6,5 @@ mod function_selector;
 pub use function_selector::*;
 mod function_arguments;
 pub use function_arguments::*;
-mod solidity_types;
-pub use solidity_types::*;
+mod dyn_sol_type_wrapper;
+pub use dyn_sol_type_wrapper::*;

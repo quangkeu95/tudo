@@ -37,6 +37,7 @@ impl Cmd for BuildArgs {
         println!("Workflow file path: {:#?}", workflow_file.green());
 
         let workflow_compose = build_workflow(workflow_file)?;
+        println!("Workflow compose {:#?}", workflow_compose);
         Ok(())
     }
 }

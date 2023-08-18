@@ -12,7 +12,9 @@ repository.workspace = true
 tudo-primitives = { workspace = true }
 ethers = { workspace = true }
 
-alloy-sol-type-parser = { version = "0.3" }
+alloy-sol-types = { version = "0.3" }
+alloy-primitives = { version = "0.3" }
+alloy-dyn-abi = { version = "0.3", features = ["arbitrary", "eip712"] }
 
 # format
 serde = { workspace = true }
@@ -23,6 +25,8 @@ serde-enum-str = "0.3"
 # misc
 eyre = { workspace = true }
 thiserror = { workspace = true }
+enum_dispatch = { workspace = true }
+proptest = { workspace = true }
 derive_more = "0.99.17"
 lazy_static = "1.4"
 regex = "1.9"

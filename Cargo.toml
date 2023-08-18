@@ -39,3 +39,6 @@ async-trait = "0.1"
 thiserror = "1.0"
 tokio = { version = "1", features = ["full"] }
 enum_dispatch = "0.3"
+
+# testing
+proptest = "1.2.0"
