@@ -29,6 +29,7 @@ impl<'de> Deserialize<'de> for DynSolTypeWrapper {
 }
 
 impl DynSolTypeWrapper {
+    /// Return inner [`DynSolType`] reference
     pub fn inner_ref(&self) -> &DynSolType {
         &self.0
     }
