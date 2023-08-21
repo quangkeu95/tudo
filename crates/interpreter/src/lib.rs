@@ -2,5 +2,6 @@
 
 mod interpreter;
 pub use interpreter::*;
+pub mod alloy_converter;
 pub mod step;
 pub mod types;
