@@ -11,6 +11,6 @@ fn main() -> eyre::Result<()> {
     let opts = Opts::parse();
 
     match opts.subcommands {
-        Subcommands::Build(cmd) => cmd.run(),
+        Subcommands::Playbook(cmd) => cmd.run(),
     }
 }

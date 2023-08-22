@@ -1,0 +1,45 @@
+version: '1'
+jobs:
+  get_uniswap_v2_pair_at_index_0:
+    steps:
+      - call_contract: # step types
+        name: "Get UniwapV2Pair address from factory at index 0"
+        arguments:
+          contract_address: "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc"
+          function_signature: "allPairs(uint256)"
+          function_selector: "0x1e3dd18b"
+          function_arguments:
+            - type: uint256
+              value: 0
+          # calldata: abi.encodeWithSignature("allPairs(uint256)", 0)
+          return_data_type: address # address or (address) 
+        save_output:
+          variable_name: uniswap_v2_pair_0
+      - call_contract:
+        name: "Get UniswapV2Pair reserves"
+        arguments:
+          contract_address: $uniswap_v2_pair_0
+          calldata: abi.encodeWithSignature("getReserves()")
+          return_data_types: (uint112, uint112, uint32)
+  get_uniswap_v2_pair_at_index_1:
+    steps:
+      - call_contract:
+        name: "Get UniwapV2Pair address from factory at index 1"
+        arguments:
+          contract_address: "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc"
+          calldata: abi.encodeWithSignature("allPairs(uint256)", 1)
+          return_data_type: address # address or (address) 
+        save_output:
+          variable_name: uniswap_v2_pair_1
+      - call_contract:
+        name: "Get UniswapV2Pair reserves"
+        arguments:
+          contract_address: $uniswap_v2_pair_0
+          calldata: abi.encodeWithSignature("getReserves()")
+          return_data_types: (uint112, uint112, uint32)
+
+workflows:
+  main_workflow:
+    jobs:
+      - get_uniswap_v2_pair_at_index_0
+      - get_uniswap_v2_pair_at_index_1

@@ -10,6 +10,7 @@ repository.workspace = true
 [dependencies]
 # internal
 tudo-primitives = { workspace = true }
+tudo-interpreter = { workspace = true }
 ethers = { workspace = true }
 
 # misc

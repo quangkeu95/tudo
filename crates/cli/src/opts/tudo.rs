@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 
-use crate::cmd::tudo::build::BuildArgs;
+use crate::cmd::tudo::playbook::PlaybookArgs;
 
 #[derive(Debug, Parser)]
 #[clap(name = "tudo", author = clap::crate_authors!("\n"), version = crate::utils::VERSION_MESSAGE)]
@@ -17,7 +17,7 @@ pub struct Opts {
 )]
 #[allow(clippy::large_enum_variant)]
 pub enum Subcommands {
-    /// Build the workflows.
-    #[clap(visible_aliases = ["b", "compile"])]
-    Build(BuildArgs),
+    /// Playbook commands
+    // #[clap(visible_aliases = [""])]
+    Playbook(PlaybookArgs),
 }

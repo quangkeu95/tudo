@@ -1,5 +1,3 @@
-pub mod config;
-
 mod function_signature;
 pub use function_signature::*;
 mod function_selector;

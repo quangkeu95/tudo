@@ -18,6 +18,7 @@ vergen = { version = "8", default-features = false, features = ["build", "git", 
 #internal
 tudo-config = { workspace = true }
 tudo-interpreter = { workspace = true }
+tudo-executor = { workspace = true }
 
 #cli
 clap = { version = "4", features = ["derive", "env", "cargo", "unicode", "wrap_help"] }
