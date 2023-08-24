@@ -30,6 +30,11 @@ proptest = { workspace = true }
 derive_more = "0.99.17"
 lazy_static = "1.4"
 regex = "1.9"
+serde_valid = { version = "0.16", features = ["yaml"] }
+serde-value = "0.7.0"
+uuid = { version = "1.4", features = ["v4", "fast-rng"]}
+strum = { version = "0.25", features = ["derive"] }
+url = { version = "2.4.0", features = ["serde"] }
 
 [dev-dependencies]
 claims = { version = "0.7" }
