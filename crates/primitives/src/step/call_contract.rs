@@ -1,3 +1,5 @@
+use crate::{StepError, StepOutput};
+
 use super::Step;
 use derive_builder::Builder;
 use ethers::abi::{ParamType, Token};
@@ -6,55 +8,12 @@ use ethers::types::{BlockId, Bytes, TransactionRequest, H160};
 use thiserror::Error;
 
 /// CallContract which implements [`Step`] trait to call contract and return [`Bytes`] data or ABI decoded return data.
-#[derive(Debug)]
+#[derive(Debug, Builder)]
 pub struct CallContract<M>
 where
     M: Middleware,
 {
     pub middleware: M,
-}
-
-impl<M> CallContract<M>
-where
-    M: Middleware,
-{
-    /// Constructor to create [`CallContract`] instance
-    pub fn new(middleware: M) -> Self {
-        Self { middleware }
-    }
-}
-
-#[async_trait::async_trait]
-impl<M> Step for CallContract<M>
-where
-    M: Middleware,
-{
-    type Input = CallContractInput;
-    type Output = CallContractOutput;
-    type Error = CallContractError<M>;
-
-    async fn execute(&self, input: &mut Self::Input) -> Result<Self::Output, Self::Error> {
-        let tx_request = TransactionRequest::new()
-            .to(input.contract_address)
-            .data(input.calldata.clone());
-        let bytes_result = self
-            .middleware
-            .call(&tx_request.into(), input.block)
-            .await
-            .map_err(|e| CallContractError::MiddlewareError(e))?;
-
-        if let Some(return_data_types) = &input.return_data_types {
-            let decoded_return_data = ethers::abi::decode(return_data_types, &bytes_result)?;
-            Ok(CallContractOutput::Tokens(decoded_return_data))
-        } else {
-            Ok(CallContractOutput::Bytes(bytes_result))
-        }
-    }
-}
-
-/// CallContract input parameters to execute call to read value from a contract
-#[derive(Debug, Builder)]
-pub struct CallContractInput {
     pub contract_address: H160,
     pub calldata: Bytes,
     #[builder(default)]
@@ -63,38 +22,28 @@ pub struct CallContractInput {
     pub return_data_types: Option<Vec<ParamType>>,
 }
 
-impl CallContractInput {
-    /// Build raw calldata in [`Bytes`] from function signature and args
-    ///
-    /// # Example
-    /// ```rust
-    /// use tudo_primitives::step::CallContractInput;
-    /// use ethers::abi::Token;
-    /// use ethers::types::{Bytes, H160, U256};
-    /// use std::str::FromStr;
-    ///
-    /// let usdt = H160::repeat_byte(1);
-    /// let uni = H160::repeat_byte(2);
-    /// let sender = H160::repeat_byte(3);
-    /// let calldata = CallContractInput::build_calldata(
-    /// "swapExactTokensForTokens(uint256,uint256,address[],address)",
-    ///     &vec![
-    ///         Token::Uint(U256::from(100000)),
-    ///         Token::Uint(U256::from(99000)),
-    ///         Token::Array(vec![Token::Address(usdt), Token::Address(uni)]),
-    ///         Token::Address(sender),
-    ///     ],
-    /// );
-    /// assert_eq!(calldata, Bytes::from_str("0x472b43f300000000000000000000000000000000000000000000000000000000000186a000000000000000000000000000000000000000000000000000000000000182b800000000000000000000000000000000000000000000000000000000000000800000000000000000000000000303030303030303030303030303030303030303000000000000000000000000000000000000000000000000000000000000000200000000000000000000000001010101010101010101010101010101010101010000000000000000000000000202020202020202020202020202020202020202").unwrap());
-    /// ```
-    pub fn build_calldata<S>(function_signature: S, args: &[Token]) -> Bytes
-    where
-        S: AsRef<str>,
-    {
-        let function_selector = ethers::utils::id(function_signature);
-        let encoded_args = ethers::abi::encode(args);
-        let call_data = [Bytes::from(function_selector), Bytes::from(encoded_args)].concat();
-        Bytes::from(call_data)
+#[async_trait::async_trait]
+impl<M> Step for CallContract<M>
+where
+    M: Middleware,
+{
+    async fn execute(&self) -> Result<StepOutput, StepError> {
+        let tx_request = TransactionRequest::new()
+            .to(self.contract_address)
+            .data(self.calldata.clone());
+        let bytes_result = self
+            .middleware
+            .call(&tx_request.into(), self.block)
+            .await
+            .map_err(|e| StepError::CallContractError(e.to_string()))?;
+
+        if let Some(return_data_types) = &self.return_data_types {
+            let decoded_return_data = ethers::abi::decode(return_data_types, &bytes_result)
+                .map_err(|e| StepError::CallContractError(e.to_string()))?;
+            Ok(CallContractOutput::Tokens(decoded_return_data).into())
+        } else {
+            Ok(CallContractOutput::Bytes(bytes_result).into())
+        }
     }
 }
 
@@ -127,6 +76,8 @@ mod tests {
     };
     use std::str::FromStr;
 
+    use crate::utils::build_calldata;
+
     use super::*;
 
     #[test]
@@ -134,7 +85,7 @@ mod tests {
         let usdt = H160::repeat_byte(1);
         let uni = H160::repeat_byte(2);
         let sender = H160::repeat_byte(3);
-        let calldata = CallContractInput::build_calldata(
+        let calldata = build_calldata(
             "swapExactTokensForTokens(uint256,uint256,address[],address)",
             &vec![
                 Token::Uint(U256::from(100000)),
@@ -155,18 +106,17 @@ mod tests {
             .parse::<H160>()
             .unwrap();
 
-        let calldata = CallContractInput::build_calldata("WETH9()", &vec![]);
+        let calldata = build_calldata("WETH9()", &vec![]);
 
-        let call_contract_step = CallContract::new(provider);
-
-        let mut input = CallContractInputBuilder::default()
+        let call_contract_step = CallContractBuilder::default()
+            .middleware(provider)
             .contract_address(contract_address)
             .calldata(calldata)
             .build()
             .unwrap();
-        let return_data = call_contract_step.execute(&mut input).await.unwrap();
+        let return_data = call_contract_step.execute().await.unwrap();
 
-        match return_data {
+        match return_data.unwrap_call_contract_output() {
             CallContractOutput::Bytes(b) => {
                 assert_eq!(
                     b,
@@ -191,19 +141,18 @@ mod tests {
             .parse::<H160>()
             .unwrap();
 
-        let calldata = CallContractInput::build_calldata("WETH9()", &vec![]);
+        let calldata = build_calldata("WETH9()", &vec![]);
 
-        let call_contract_step = CallContract::new(provider);
-
-        let mut input = CallContractInputBuilder::default()
+        let call_contract_step = CallContractBuilder::default()
+            .middleware(provider)
             .contract_address(contract_address)
             .calldata(calldata)
             .return_data_types(Some(vec![ParamType::Address]))
             .build()
             .unwrap();
-        let return_data = call_contract_step.execute(&mut input).await.unwrap();
+        let return_data = call_contract_step.execute().await.unwrap();
 
-        match return_data {
+        match return_data.unwrap_call_contract_output() {
             CallContractOutput::Tokens(tokens) => {
                 let expected_data = vec![Token::Address(
                     "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"

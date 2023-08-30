@@ -1,65 +1,46 @@
-use crate::Step;
+use crate::{Step, StepError, StepOutput};
 use derive_builder::Builder;
 use ethers::middleware::signer::SignerMiddlewareError;
 use ethers::prelude::{Middleware, ProviderError, Signer, SignerMiddleware, TransactionReceipt};
 use ethers::types::transaction::eip2718::TypedTransaction;
 use ethers::types::BlockId;
-use ethers::types::TransactionRequest;
 use thiserror::Error;
 
 /// Allow to send transaction using a [`SignerMiddleware`]
-#[derive(Debug)]
-pub struct SendTransaction<M: Middleware, S: Signer> {
-    pub signer_middleware: SignerMiddleware<M, S>,
-}
-
-impl<M, S> SendTransaction<M, S>
-where
-    M: Middleware,
-    S: Signer,
-{
-    pub fn new(signer_middleware: SignerMiddleware<M, S>) -> Self {
-        Self { signer_middleware }
-    }
-}
-
-#[async_trait::async_trait]
-impl<M, S> Step for SendTransaction<M, S>
-where
-    M: Middleware,
-    S: Signer,
-{
-    type Input = SendTransactionInput<TransactionRequest>;
-
-    type Output = SendTransactionOutput;
-
-    type Error = SendTransactionError<M, S>;
-
-    async fn execute(&self, input: &mut Self::Input) -> Result<Self::Output, Self::Error> {
-        let pending_tx = self
-            .signer_middleware
-            .send_transaction(input.tx_request.clone(), input.block)
-            .await?;
-
-        let tx_receipt = pending_tx.await?;
-        Ok(SendTransactionOutput::TransactionReceipt(tx_receipt))
-    }
-}
-
 #[derive(Debug, Builder)]
-pub struct SendTransactionInput<Tx>
+pub struct SendTransaction<M: Middleware, S: Signer, Tx>
 where
-    Tx: Into<TypedTransaction> + Send + Sync,
+    Tx: Into<TypedTransaction> + Send + Sync + Clone,
 {
+    pub signer_middleware: SignerMiddleware<M, S>,
     pub tx_request: Tx,
     #[builder(default)]
     pub block: Option<BlockId>,
-    // pub is_returning_pending_tx: bool,
+}
+
+#[async_trait::async_trait]
+impl<M, S, Tx> Step for SendTransaction<M, S, Tx>
+where
+    M: Middleware,
+    S: Signer,
+    Tx: Into<TypedTransaction> + Send + Sync + Clone,
+{
+    async fn execute(&self) -> Result<StepOutput, StepError> {
+        let pending_tx = self
+            .signer_middleware
+            .send_transaction(self.tx_request.clone(), self.block)
+            .await
+            .map_err(|e| StepError::SendTransactionError(e.to_string()))?;
+
+        let tx_receipt = pending_tx
+            .await
+            .map_err(|e| StepError::SendTransactionError(e.to_string()))?;
+        Ok(SendTransactionOutput::TransactionReceipt(tx_receipt).into())
+    }
 }
 
 #[derive(Debug)]
 pub enum SendTransactionOutput {
-    // PendingTx(PendingTransaction<'a, P>),
     TransactionReceipt(Option<TransactionReceipt>),
 }
 
@@ -98,15 +79,15 @@ mod tests {
         // craft the transaction
         let tx = TransactionRequest::new().to(wallet2.address()).value(10000);
 
-        let step = SendTransaction::new(client);
-
-        let mut send_transaction_input = SendTransactionInputBuilder::default()
+        let step = SendTransactionBuilder::default()
+            .signer_middleware(client)
             .tx_request(tx)
             .build()
             .unwrap();
 
-        let output = step.execute(&mut send_transaction_input).await.unwrap();
-        let SendTransactionOutput::TransactionReceipt(tx_receipt) = output;
+        let output = step.execute().await.unwrap();
+        let SendTransactionOutput::TransactionReceipt(tx_receipt) =
+            output.unwrap_send_transaction_output();
         let _tx_receipt = assert_some!(tx_receipt);
     }
 }
