@@ -1,16 +1,17 @@
 use clap::Parser;
 use tudo_cli::{
-    cmd::utils::Cmd,
-    opts::tudo::{Opts, Subcommands},
+    cli::tudo::{Cli, Subcommands},
+    cmd::utils::AsyncCmd,
     utils,
 };
 
-fn main() -> eyre::Result<()> {
+#[tokio::main]
+async fn main() -> eyre::Result<()> {
     utils::tracing_subscriber();
     utils::enable_terminal_colors();
-    let opts = Opts::parse();
+    let cli = Cli::parse();
 
-    match opts.subcommands {
-        Subcommands::Playbook(cmd) => cmd.run(),
+    match cli.subcommands {
+        Subcommands::Playbook(cmd) => cmd.run().await,
     }
 }

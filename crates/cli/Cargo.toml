@@ -33,3 +33,6 @@ color-eyre = { workspace = true }
 eyre = { workspace = true }
 serde = { workspace = true }
 
+# async runtime
+tokio = { workspace = true }
+async-trait = { workspace = true }

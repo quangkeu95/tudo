@@ -6,7 +6,7 @@ use std::path::PathBuf;
 use tudo_executor::playbook::Executor;
 use tudo_interpreter::playbook::Playbook;
 
-use crate::cmd::utils::Cmd;
+use crate::cmd::utils::AsyncCmd;
 
 mod core;
 pub use self::core::*;
@@ -18,21 +18,19 @@ pub struct PlaybookArgs {
     /// Playbook file path.
     #[serde(skip)]
     pub playbook_file: PathBuf,
-    // #[clap(flatten)]
-    // #[serde(flatten)]
-    // pub args: CorePlaybookArgs,
 }
 
-impl Cmd for PlaybookArgs {
+#[async_trait::async_trait]
+impl AsyncCmd for PlaybookArgs {
     type Output = ();
 
     /// Parse and run playbook
-    fn run(self) -> eyre::Result<Self::Output> {
+    async fn run(self) -> eyre::Result<Self::Output> {
         println!("Playbook file path: {:#?}", self.playbook_file.green());
 
         let playbook = Playbook::from_file(self.playbook_file)?;
 
-        Executor::run(&playbook)?;
+        Executor::run(playbook).await?;
         Ok(())
     }
 }
