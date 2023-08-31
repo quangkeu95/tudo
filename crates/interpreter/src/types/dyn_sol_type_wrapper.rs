@@ -1,11 +1,18 @@
 use alloy_dyn_abi::DynSolType;
 use derive_more::{Deref, From};
 use serde::{Deserialize, Deserializer};
-use serde_yaml::Value;
+use serde_value::Value;
 
 /// Wrapper type which implements deserialization for [`DynSolType`]
 #[derive(Debug, Deref, From)]
 pub struct DynSolTypeWrapper(DynSolType);
+
+/// By default the DynSolTypeWrapper is a tuple
+impl Default for DynSolTypeWrapper {
+    fn default() -> Self {
+        Self(DynSolType::Tuple(vec![]))
+    }
+}
 
 impl<'de> Deserialize<'de> for DynSolTypeWrapper {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
@@ -14,7 +21,7 @@ impl<'de> Deserialize<'de> for DynSolTypeWrapper {
     {
         let value = Value::deserialize(deserializer)?;
 
-        if let serde_yaml::Value::String(value) = value {
+        if let Value::String(value) = value {
             let sol_type: DynSolType = value.parse().map_err(|e| {
                 serde::de::Error::custom(format!("cannot parse Solidity types, error {:#?}", e))
             })?;

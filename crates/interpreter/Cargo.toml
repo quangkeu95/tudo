@@ -27,6 +27,7 @@ eyre = { workspace = true }
 thiserror = { workspace = true }
 enum_dispatch = { workspace = true }
 proptest = { workspace = true }
+tokio = { workspace = true }
 derive_more = "0.99.17"
 lazy_static = "1.4"
 regex = "1.9"

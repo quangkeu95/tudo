@@ -8,3 +8,5 @@ mod dyn_sol_type_wrapper;
 pub use dyn_sol_type_wrapper::*;
 mod function_return_types;
 pub use function_return_types::*;
+mod variable_name;
+pub use variable_name::*;
