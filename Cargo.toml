@@ -26,7 +26,7 @@ tudo-config = { version = "0.1.0", path = "crates/config"}
 tudo-primitives = { version = "0.1.0", path = "crates/primitives"}
 tudo-executor = { version = "0.1.0", path = "crates/executor"}
 
-ethers = { git = "https://github.com/gakonst/ethers-rs"}
+ethers = { git = "https://github.com/gakonst/ethers-rs", features = ["ws", "ipc"]}
 
 # format
 serde = { version = "1.0", features = ["derive"] }
