@@ -21,6 +21,7 @@ eyre = { workspace = true }
 enum_dispatch = { workspace = true }
 derive_builder = "0.12.0"
 derive_more = "0.99"
+futures = "0.3.28"
 
 [dev-dependencies]
 claims = { version = "0.7" }
