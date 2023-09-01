@@ -11,6 +11,7 @@ repository.workspace = true
 # internal
 tudo-primitives = { workspace = true }
 tudo-interpreter = { workspace = true }
+tudo-config = { workspace = true }
 ethers = { workspace = true }
 
 # misc

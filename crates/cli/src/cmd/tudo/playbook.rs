@@ -3,6 +3,7 @@ use clap::Parser;
 use owo_colors::OwoColorize;
 use serde::Serialize;
 use std::path::PathBuf;
+use tudo_config::logging::{__tracing as tracing, info, instrument};
 use tudo_executor::playbook::Executor;
 use tudo_interpreter::playbook::Playbook;
 
@@ -25,9 +26,9 @@ impl AsyncCmd for PlaybookArgs {
     type Output = ();
 
     /// Parse and run playbook
+    #[instrument(span = "PlaybookCliRun", skip_all)]
     async fn run(self) -> eyre::Result<Self::Output> {
-        println!("Playbook file path: {:#?}", self.playbook_file.green());
-
+        info!("Running playbook at {:#?}", &self.playbook_file.green());
         let playbook = Playbook::from_file(self.playbook_file)?;
 
         Executor::run(playbook).await?;

@@ -2,6 +2,7 @@
 
 pub mod utils;
 pub use crate::utils::*;
+pub mod logging;
 
 /// Tudo configuration
 #[derive(Debug)]

@@ -22,9 +22,6 @@ tudo-executor = { workspace = true }
 
 #cli
 clap = { version = "4", features = ["derive", "env", "cargo", "unicode", "wrap_help"] }
-tracing-error = "0.2"
-tracing-subscriber = { version = "0.3", features = ["registry", "env-filter", "fmt"] }
-tracing = "0.1"
 owo-colors = { version = "3.5", features = ["supports-colors"]}
 
 # misc

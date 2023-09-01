@@ -1,4 +1,5 @@
 use thiserror::Error;
+use tudo_config::logging::info;
 use tudo_interpreter::workflow::{WorkflowConfig, WorkflowName};
 
 pub struct WorkflowExecutor {}
@@ -8,6 +9,7 @@ impl WorkflowExecutor {
         workflow_name: &WorkflowName,
         workflow: &WorkflowConfig,
     ) -> Result<(), WorkflowExecuteError> {
+        info!("execute workflow {:#?}", workflow_name);
         Ok(())
     }
 }

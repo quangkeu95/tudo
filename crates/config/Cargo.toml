@@ -9,3 +9,8 @@ repository.workspace = true
 
 [dependencies]
 eyre = { workspace = true }
+
+# logging
+tracing-error = "0.2"
+tracing-subscriber = { version = "0.3", features = ["registry", "env-filter", "fmt"] }
+tracing = "0.1"
