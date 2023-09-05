@@ -60,17 +60,17 @@ impl CallContract {
 }
 
 impl StepArgumentTrait for CallContract {
-    fn into_step(self) -> Result<Box<dyn tudo_primitives::Step>, super::StepArgumentsError> {
+    fn as_step(&self) -> Result<Box<dyn tudo_primitives::Step>, super::StepArgumentsError> {
         let contract_address = AlloyConverter::from_alloy_address(&self.contract_address);
         let calldata = self.calldata()?;
         let return_data_types = self.as_function_return_param_types();
 
-        match self.rpc_provider {
+        match &self.rpc_provider {
             RpcProvider::Http(provider)
             | RpcProvider::HttpWithBasicAuth(provider)
             | RpcProvider::HttpWithBearerAuth(provider) => {
                 let call_contract_step = CallContractBuilder::default()
-                    .middleware(provider)
+                    .middleware(provider.clone())
                     .contract_address(contract_address)
                     .calldata(calldata)
                     .block(self.block)
@@ -82,7 +82,7 @@ impl StepArgumentTrait for CallContract {
             | RpcProvider::WebsocketWithBasicAuth(provider)
             | RpcProvider::WebsocketWithBearerAuth(provider) => {
                 let call_contract_step = CallContractBuilder::default()
-                    .middleware(provider)
+                    .middleware(provider.clone())
                     .contract_address(contract_address)
                     .calldata(calldata)
                     .block(self.block)
@@ -92,7 +92,7 @@ impl StepArgumentTrait for CallContract {
             }
             RpcProvider::Ipc(provider) => {
                 let call_contract_step = CallContractBuilder::default()
-                    .middleware(provider)
+                    .middleware(provider.clone())
                     .contract_address(contract_address)
                     .calldata(calldata)
                     .block(self.block)
