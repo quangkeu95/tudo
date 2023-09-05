@@ -1,4 +1,4 @@
-use derive_more::From;
+use derive_more::{AsRef, From};
 use ethers::types::Bytes;
 use serde::Deserialize;
 
@@ -16,7 +16,7 @@ use serde::Deserialize;
 ///     Bytes::from_str("0x1e3dd18b").unwrap()
 /// );
 /// ```
-#[derive(Debug, Deserialize, From)]
+#[derive(Debug, Clone, Deserialize, From, AsRef)]
 pub struct FunctionSignature(String);
 
 impl FunctionSignature {

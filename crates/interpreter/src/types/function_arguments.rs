@@ -9,7 +9,7 @@ use crate::alloy_converter::AlloyConverter;
 use super::DynSolTypeWrapper;
 
 /// Solidity function argument, which contains a Solidity type specifier and a Solidity value
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FunctionArgument {
     pub solidity_type: DynSolTypeWrapper,
     pub solidity_value: DynSolValue,
@@ -51,7 +51,8 @@ impl FunctionArgument {
         self.solidity_type.inner_ref()
     }
 
-    fn to_ethers_abi_token(&self) -> Result<ethers::abi::Token, FunctionArgumentError> {
+    /// Convert the inner alloy Solidity value into the equivalent [`ethers::abi::Token`]
+    pub fn to_ethers_abi_token(&self) -> Result<ethers::abi::Token, FunctionArgumentError> {
         Self::dyn_sol_value_to_ethers_abi_token(&self.solidity_value)
     }
 

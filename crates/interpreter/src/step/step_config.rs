@@ -5,8 +5,8 @@ use crate::step::CallContract;
 
 use super::{StepArguments, StepName, StepOutput, StepTypes};
 
-/// Abstract layer for Step configuration
-#[derive(Debug, Validate)]
+/// Step definition
+#[derive(Debug, Validate, Clone)]
 pub struct StepConfig {
     pub step_type: StepTypes,
     pub name: StepName,

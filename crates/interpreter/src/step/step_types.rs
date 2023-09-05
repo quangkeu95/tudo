@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Step types that can be used in the playbook definition file
-#[derive(Debug, Deserialize, Serialize, PartialEq, strum::Display)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, strum::Display)]
 pub enum StepTypes {
     CallContract,
     MockStep,

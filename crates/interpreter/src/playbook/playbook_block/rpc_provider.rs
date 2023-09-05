@@ -4,7 +4,7 @@ use serde::Deserialize;
 use url::Url;
 
 /// RpcProvider supports deserialization from yaml file to construct ethers-rs provider type.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum RpcProvider {
     Http(Provider<Http>),
     HttpWithBasicAuth(Provider<Http>),
@@ -12,7 +12,7 @@ pub enum RpcProvider {
     Websocket(Provider<Ws>),
     WebsocketWithBasicAuth(Provider<Ws>),
     WebsocketWithBearerAuth(Provider<Ws>),
-    Ipc(Ipc),
+    Ipc(Provider<Ipc>),
     // Quorum(QuorumProvider),
 }
 
@@ -106,7 +106,7 @@ impl<'de> Deserialize<'de> for RpcProvider {
                 Ok(RpcProvider::WebsocketWithBearerAuth(provider))
             }
             RpcProviderTypes::Ipc => {
-                let async_conn = Ipc::connect(helper.chain_rpc_url);
+                let async_conn = Provider::<Ipc>::connect_ipc(helper.chain_rpc_url);
 
                 let rt = tokio::runtime::Runtime::new().map_err(serde::de::Error::custom)?;
                 let provider = rt.block_on(async_conn).map_err(serde::de::Error::custom)?;

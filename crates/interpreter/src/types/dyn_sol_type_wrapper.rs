@@ -1,10 +1,11 @@
 use alloy_dyn_abi::DynSolType;
 use derive_more::{Deref, From};
+use ethers::abi::ParamType;
 use serde::{Deserialize, Deserializer};
 use serde_value::Value;
 
 /// Wrapper type which implements deserialization for [`DynSolType`]
-#[derive(Debug, Deref, From)]
+#[derive(Debug, Clone, Deref, From)]
 pub struct DynSolTypeWrapper(DynSolType);
 
 /// By default the DynSolTypeWrapper is a tuple
@@ -39,6 +40,40 @@ impl DynSolTypeWrapper {
     /// Return inner [`DynSolType`] reference
     pub fn inner_ref(&self) -> &DynSolType {
         &self.0
+    }
+
+    fn to_ethers_param_type(sol_type: &DynSolType) -> ParamType {
+        match sol_type {
+            DynSolType::Address => ParamType::Address,
+            DynSolType::Bool => ParamType::Bool,
+            DynSolType::Int(size) => ParamType::Int(*size),
+            DynSolType::Uint(size) => ParamType::Uint(*size),
+            DynSolType::FixedBytes(size) => ParamType::FixedBytes(*size),
+            DynSolType::Bytes => ParamType::Bytes,
+            DynSolType::String => ParamType::String,
+            DynSolType::Array(root_type) => {
+                ParamType::Array(Box::new(Self::to_ethers_param_type(root_type)))
+            }
+            DynSolType::FixedArray(root_type, size) => {
+                ParamType::FixedArray(Box::new(Self::to_ethers_param_type(root_type)), *size)
+            }
+            DynSolType::Tuple(vec_param_type) => ParamType::Tuple(
+                vec_param_type
+                    .iter()
+                    .map(|item| Self::to_ethers_param_type(item))
+                    .collect::<Vec<ParamType>>(),
+            ),
+            DynSolType::CustomStruct {
+                name: _,
+                prop_names: _,
+                tuple: _,
+            } => panic!("cannot convert DynSolType::CustomSutrct into ethers ParamType"),
+        }
+    }
+
+    /// Convert inner [`DynSolType`] into [`ParamType`]
+    pub fn as_ethers_param_type(&self) -> ParamType {
+        Self::to_ethers_param_type(&self.0)
     }
 }
 
