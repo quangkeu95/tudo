@@ -17,9 +17,9 @@ pub enum StepArguments {
 }
 
 impl StepArgumentTrait for StepArguments {
-    fn as_step(&self) -> Result<Box<dyn tudo_primitives::Step>, StepArgumentsError> {
+    fn to_step(&self) -> Result<Box<dyn tudo_primitives::Step>, StepArgumentsError> {
         match self {
-            StepArguments::CallContract(inner) => inner.as_step(),
+            StepArguments::CallContract(inner) => inner.to_step(),
         }
     }
 }

@@ -60,7 +60,7 @@ impl CallContract {
 }
 
 impl StepArgumentTrait for CallContract {
-    fn as_step(&self) -> Result<Box<dyn tudo_primitives::Step>, super::StepArgumentsError> {
+    fn to_step(&self) -> Result<Box<dyn tudo_primitives::Step>, super::StepArgumentsError> {
         let contract_address = AlloyConverter::from_alloy_address(&self.contract_address);
         let calldata = self.calldata()?;
         let return_data_types = self.as_function_return_param_types();
@@ -124,7 +124,7 @@ mod tests {
     }
 
     #[test]
-    fn can_convert_call_contract_step_argument_into_step() {
+    fn can_convert_call_contract_step_argument_to_step() {
         let yaml = r#"
             chain_rpc_url: "https://eth.llamarpc.com"
             contract_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
@@ -136,6 +136,6 @@ mod tests {
         "#;
 
         let call_contract_step_argument: CallContract = serde_yaml::from_str(yaml).unwrap();
-        let _step = call_contract_step_argument.into_step().unwrap();
+        let _step = call_contract_step_argument.to_step().unwrap();
     }
 }
