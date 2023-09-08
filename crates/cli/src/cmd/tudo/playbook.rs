@@ -26,7 +26,7 @@ impl AsyncCmd for PlaybookArgs {
     type Output = ();
 
     /// Parse and run playbook
-    #[instrument(span = "PlaybookCliRun", skip_all)]
+    #[instrument(name = "PlaybookCliRun", skip_all)]
     async fn run(self) -> eyre::Result<Self::Output> {
         info!("Running playbook at {:#?}", &self.playbook_file.green());
         let playbook = Playbook::from_file(self.playbook_file)?;
