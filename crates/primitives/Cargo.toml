@@ -8,7 +8,21 @@ homepage.workspace = true
 repository.workspace = true
 
 [dependencies]
-async-trait = "0.1.72"
-auto_impl = "1.1.0"
+# internal
+ethers = { workspace = true }
+
+# misc
+async-trait = { workspace = true }
 eyre = { workspace = true }
+tokio = { workspace = true }
+thiserror = { workspace = true }
+enum_dispatch = { workspace = true }
+futures = { workspace = true }
+auto_impl = "1.1.0"
 hashbrown = "0.14.0"
+derive_builder = "0.12.0"
+derive_more = "0.99"
+
+
+[dev-dependencies]
+claims = { version = "0.7" }

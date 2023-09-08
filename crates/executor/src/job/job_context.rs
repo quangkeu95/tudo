@@ -1,35 +1,38 @@
-use std::collections::BTreeMap;
+use std::collections::HashMap;
+
 use thiserror::Error;
+use tudo_interpreter::step::StepName;
+use tudo_primitives::StepOutput;
 
-use crate::step::StepOutput;
-
-#[derive(Debug)]
+#[derive(Clone)]
 pub struct JobContext {
-    pub step_outputs: BTreeMap<String, StepOutput>,
+    step_outputs: HashMap<StepName, StepOutput>,
 }
 
 impl JobContext {
     pub fn new() -> Self {
         Self {
-            step_outputs: BTreeMap::new(),
+            step_outputs: HashMap::new(),
         }
     }
 
+    /// Add step output to job context
     pub fn add_step_output(
         &mut self,
-        step_id: String,
+        step_name: &StepName,
         step_output: StepOutput,
     ) -> Result<(), JobContextError> {
-        if self.step_outputs.contains_key(&step_id) {
-            return Err(JobContextError::StepIdExisted(step_id));
+        if !self.step_outputs.contains_key(step_name) {
+            self.step_outputs.insert(step_name.clone(), step_output);
+            Ok(())
+        } else {
+            Err(JobContextError::StepExisted(step_name.clone()))
         }
-        self.step_outputs.insert(step_id, step_output);
-        Ok(())
     }
 }
 
 #[derive(Debug, Error)]
 pub enum JobContextError {
-    #[error("Step ID is already existed: {0}")]
-    StepIdExisted(String),
+    #[error("step with name {:#?} already existed", .0)]
+    StepExisted(StepName),
 }

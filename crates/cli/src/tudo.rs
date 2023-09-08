@@ -1,16 +1,19 @@
 use clap::Parser;
 use tudo_cli::{
-    cmd::utils::Cmd,
-    opts::tudo::{Opts, Subcommands},
+    cli::tudo::{Cli, Subcommands},
+    cmd::utils::AsyncCmd,
     utils,
 };
+use tudo_config::logging::{info, init_tracing_subscriber};
 
-fn main() -> eyre::Result<()> {
-    utils::tracing_subscriber();
+#[tokio::main]
+async fn main() -> eyre::Result<()> {
+    init_tracing_subscriber();
+    info!("Tracing initialized");
     utils::enable_terminal_colors();
-    let opts = Opts::parse();
+    let cli = Cli::parse();
 
-    match opts.subcommands {
-        Subcommands::Build(cmd) => cmd.run(),
+    match cli.subcommands {
+        Subcommands::Playbook(cmd) => cmd.run().await,
     }
 }

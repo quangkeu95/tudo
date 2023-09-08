@@ -1,5 +1,3 @@
-pub mod config;
-
 mod function_signature;
 pub use function_signature::*;
 mod function_selector;
@@ -8,3 +6,7 @@ mod function_arguments;
 pub use function_arguments::*;
 mod dyn_sol_type_wrapper;
 pub use dyn_sol_type_wrapper::*;
+mod function_return_types;
+pub use function_return_types::*;
+mod variable_name;
+pub use variable_name::*;

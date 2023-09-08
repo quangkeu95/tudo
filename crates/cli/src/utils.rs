@@ -1,6 +1,3 @@
-use tracing_error::ErrorLayer;
-use tracing_subscriber::prelude::*;
-
 /// The version message for the current program, like
 /// `tudo 0.1.0 (f01b232bc 2022-01-22T23:28:39.493201+00:00)`
 pub(crate) const VERSION_MESSAGE: &str = concat!(
@@ -11,16 +8,6 @@ pub(crate) const VERSION_MESSAGE: &str = concat!(
     env!("VERGEN_BUILD_TIMESTAMP"),
     ")"
 );
-
-/// Initializes a tracing Subscriber for logging
-#[allow(dead_code)]
-pub fn tracing_subscriber() {
-    tracing_subscriber::Registry::default()
-        .with(tracing_subscriber::EnvFilter::from_default_env())
-        .with(ErrorLayer::default())
-        .with(tracing_subscriber::fmt::layer())
-        .init()
-}
 
 /// Disables terminal colours if either:
 /// - Running windows and the terminal does not support colour codes.

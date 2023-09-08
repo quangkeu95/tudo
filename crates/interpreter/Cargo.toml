@@ -17,7 +17,7 @@ alloy-primitives = { version = "0.3" }
 alloy-dyn-abi = { version = "0.3", features = ["arbitrary", "eip712"] }
 
 # format
-serde = { workspace = true }
+serde = { workspace = true, features = ["rc"] }
 serde_json = { workspace = true }
 serde_yaml = "0.9.25"
 serde-enum-str = "0.3"
@@ -27,9 +27,16 @@ eyre = { workspace = true }
 thiserror = { workspace = true }
 enum_dispatch = { workspace = true }
 proptest = { workspace = true }
+tokio = { workspace = true }
+derive_builder = { workspace = true }
 derive_more = "0.99.17"
 lazy_static = "1.4"
 regex = "1.9"
+serde_valid = { version = "0.16", features = ["yaml"] }
+serde-value = "0.7.0"
+uuid = { version = "1.4", features = ["v4", "fast-rng"]}
+strum = { version = "0.25", features = ["derive"] }
+url = { version = "2.4.0", features = ["serde"] }
 
 [dev-dependencies]
 claims = { version = "0.7" }

@@ -1,6 +1,7 @@
 use alloy_dyn_abi::{DynSolType, DynSolValue};
 use alloy_primitives::Bytes;
 use serde::{Deserialize, Deserializer};
+use serde_value::Value;
 use thiserror::Error;
 
 use crate::alloy_converter::AlloyConverter;
@@ -8,7 +9,7 @@ use crate::alloy_converter::AlloyConverter;
 use super::DynSolTypeWrapper;
 
 /// Solidity function argument, which contains a Solidity type specifier and a Solidity value
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FunctionArgument {
     pub solidity_type: DynSolTypeWrapper,
     pub solidity_value: DynSolValue,
@@ -19,33 +20,26 @@ impl<'de> Deserialize<'de> for FunctionArgument {
     where
         D: Deserializer<'de>,
     {
-        let value = serde_yaml::Value::deserialize(deserializer)?;
+        #[derive(Deserialize)]
+        struct FunctionArgumentHelper {
+            #[serde(alias = "type")]
+            solidity_type: DynSolTypeWrapper,
+            #[serde(alias = "value")]
+            solidity_value: Value,
+        }
 
-        let solidity_type = value
-            .get("type")
-            .ok_or(serde::de::Error::missing_field("type"))?;
-        let solidity_value = value
-            .get("value")
-            .ok_or(serde::de::Error::missing_field("value"))?;
+        let helper = FunctionArgumentHelper::deserialize(deserializer)?;
 
-        let solidity_type = DynSolTypeWrapper::deserialize(solidity_type).map_err(|e| {
-            serde::de::Error::custom(format!("parse Solidity types error {:#?}", e))
-        })?;
+        let solidity_value =
+            serde_json::to_value(helper.solidity_value).map_err(serde::de::Error::custom)?;
 
-        let solidity_value: serde_json::Value = serde_yaml::from_value(solidity_value.to_owned())
-            .map_err(|e| {
-            serde::de::Error::custom(format!(
-                "convert Solidity value from yaml to json error {:#?}",
-                e
-            ))
-        })?;
-
-        let solidity_value: DynSolValue = solidity_type.coerce(&solidity_value).map_err(|e| {
-            serde::de::Error::custom(format!("parse Solidity value error {:#?}", e))
-        })?;
+        let solidity_value: DynSolValue = helper
+            .solidity_type
+            .coerce(&solidity_value)
+            .map_err(serde::de::Error::custom)?;
 
         Ok(Self {
-            solidity_type,
+            solidity_type: helper.solidity_type,
             solidity_value,
         })
     }
@@ -57,7 +51,8 @@ impl FunctionArgument {
         self.solidity_type.inner_ref()
     }
 
-    fn to_ethers_abi_token(&self) -> Result<ethers::abi::Token, FunctionArgumentError> {
+    /// Convert the inner alloy Solidity value into the equivalent [`ethers::abi::Token`]
+    pub fn to_ethers_abi_token(&self) -> Result<ethers::abi::Token, FunctionArgumentError> {
         Self::dyn_sol_value_to_ethers_abi_token(&self.solidity_value)
     }
 
