@@ -39,7 +39,7 @@ where
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum SendTransactionOutput {
     TransactionReceipt(Option<TransactionReceipt>),
 }

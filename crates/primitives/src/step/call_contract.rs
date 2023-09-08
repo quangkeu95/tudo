@@ -48,7 +48,7 @@ where
 }
 
 /// CallContract output which in [`Bytes`] or [`Vec<Token>`]
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum CallContractOutput {
     Bytes(Bytes),
     Tokens(Vec<Token>),

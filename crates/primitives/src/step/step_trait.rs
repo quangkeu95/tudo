@@ -3,7 +3,7 @@ use async_trait::async_trait;
 
 /// A step can be executed individually and can be chained to make a pipeline in a job.
 #[async_trait]
-pub trait Step {
+pub trait Step: Send + Sync {
     /// Execute the step and return result
     async fn execute(&self) -> Result<StepOutput, StepError>;
 }
