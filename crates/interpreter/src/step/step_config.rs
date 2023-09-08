@@ -1,9 +1,13 @@
 use serde::Deserialize;
 use serde_valid::Validate;
+use thiserror::Error;
+use tudo_primitives::Step;
 
 use crate::step::CallContract;
 
-use super::{StepArguments, StepName, StepOutput, StepTypes};
+use super::{
+    StepArgumentTrait, StepArguments, StepArgumentsError, StepName, StepOutput, StepTypes,
+};
 
 /// Step definition
 #[derive(Debug, Validate, Clone)]
@@ -11,11 +15,15 @@ pub struct StepConfig {
     pub step_type: StepTypes,
     pub name: StepName,
     pub description: Option<String>,
-    pub arguments: Option<StepArguments>,
+    pub arguments: StepArguments,
     pub output: Option<StepOutput>,
 }
 
-impl StepConfig {}
+impl StepConfig {
+    pub fn to_step(&self) -> Result<Box<dyn Step>, StepConfigError> {
+        self.arguments.to_step().map_err(StepConfigError::from)
+    }
+}
 
 impl<'de> Deserialize<'de> for StepConfig {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
@@ -40,6 +48,7 @@ impl<'de> Deserialize<'de> for StepConfig {
             .unwrap_or(StepName::random_with_prefix(helper.step_type.to_string()));
 
         let step_arguments = match helper.step_type {
+            StepTypes::BlankStep => StepArguments::BlankStep,
             StepTypes::CallContract => {
                 let arguments = helper
                     .arguments
@@ -48,9 +57,8 @@ impl<'de> Deserialize<'de> for StepConfig {
                 let call_contract_arguments = CallContract::deserialize(arguments)
                     .map(StepArguments::CallContract)
                     .map_err(serde::de::Error::custom)?;
-                Some(call_contract_arguments)
+                call_contract_arguments
             }
-            _ => None,
         };
 
         let step_output = match helper.step_type {
@@ -71,6 +79,12 @@ impl<'de> Deserialize<'de> for StepConfig {
             output: step_output,
         })
     }
+}
+
+#[derive(Debug, Error)]
+pub enum StepConfigError {
+    #[error(transparent)]
+    StepArgumentsError(#[from] StepArgumentsError),
 }
 
 #[cfg(test)]

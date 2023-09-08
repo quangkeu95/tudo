@@ -1,12 +1,12 @@
 use crate::{
     job::{JobConfig, JobName},
     workflow::{
-        WorkflowConfig, WorkflowConfigBuilder, WorkflowConfigBuilderError, WorkflowConfigHelper,
-        WorkflowName,
+        JobConfigInWorkflowEnum, WorkflowConfig, WorkflowConfigBuilder, WorkflowConfigBuilderError,
+        WorkflowConfigHelper, WorkflowName,
     },
 };
 use derive_builder::Builder;
-use serde::{Deserialize, Deserializer};
+use serde::Deserialize;
 use std::{collections::HashMap, fs::File, io::Read, path::Path, sync::Arc};
 use thiserror::Error;
 
@@ -21,52 +21,52 @@ pub struct PlaybookDeserializeHelper {
     pub workflows: HashMap<WorkflowName, WorkflowConfigHelper>,
 }
 
-impl PlaybookDeserializeHelper {
-    pub fn validate(&self) -> Result<(), PlaybookDeserializeHelperError> {
-        for workflow_config in self.workflows.values() {
-            for job_name in workflow_config.jobs.keys() {
-                if !self.jobs.contains_key(job_name) {
-                    return Err(PlaybookDeserializeHelperError::JobNotDefined(
-                        job_name.clone(),
-                    ));
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
 impl TryFrom<PlaybookDeserializeHelper> for Playbook {
     type Error = PlaybookDeserializeHelperError;
     fn try_from(value: PlaybookDeserializeHelper) -> Result<Self, Self::Error> {
-        // value.validate()?;
-
         let setup = value.setup.map(Arc::new);
         let jobs = Arc::new(value.jobs);
 
-        let workflows = value
-            .workflows
-            .into_iter()
-            .map(|(workflow_name, workflow_config_helper)| {
-                let jobs = workflow_config_helper
-                    .jobs
-                    .into_iter()
-                    .map(|(job_name, _job_config_helper)| {
-                        let job_config = jobs.get(&job_name).ok_or(
-                            PlaybookDeserializeHelperError::JobNotDefined(job_name.clone()),
-                        )?;
-                        let job_config = job_config.clone();
+        let mut workflows = HashMap::new();
 
-                        // TODO: append job_config_helper settings into job_config
-                        Ok((job_name, job_config))
-                    })
-                    .collect::<Result<HashMap<JobName, JobConfig>, PlaybookDeserializeHelperError>>(
-                    )?;
+        for (workflow_name, workflow_config_helper) in value.workflows {
+            let job_config_mapping = workflow_config_helper
+                .jobs
+                .iter()
+                .map(|item| match item {
+                    JobConfigInWorkflowEnum::JobName(job_name) => {
+                        let job_config = jobs
+                            .get(&job_name)
+                            .ok_or(PlaybookDeserializeHelperError::JobNotDefined(
+                                job_name.clone(),
+                            ))?
+                            .clone();
 
-                let workflow_config = WorkflowConfigBuilder::default().jobs(jobs).build()?;
-                Ok((workflow_name, workflow_config))
-            })
-            .collect::<Result<HashMap<WorkflowName, WorkflowConfig>, PlaybookDeserializeHelperError>>()?;
+                        Ok((job_name.clone(), job_config))
+                    }
+
+                    JobConfigInWorkflowEnum::JobConfig(job_config_helper) => {
+                        let job_name = job_config_helper.name.clone();
+                        let mut job_config = jobs
+                            .get(&job_name)
+                            .ok_or(PlaybookDeserializeHelperError::JobNotDefined(
+                                job_name.clone(),
+                            ))?
+                            .clone();
+
+                        job_config.with_job_config_helper(&job_config_helper);
+
+                        Ok((job_name.clone(), job_config))
+                    }
+                })
+                .collect::<Result<HashMap<JobName, JobConfig>, Self::Error>>()?;
+
+            let workflow_config = WorkflowConfigBuilder::default()
+                .jobs(job_config_mapping)
+                .build()?;
+
+            workflows.insert(workflow_name, workflow_config);
+        }
 
         let workflows = Arc::new(workflows);
 
@@ -112,32 +112,23 @@ impl Playbook {
         Ok(playbook)
     }
 
-    /// Deserialize setup into shared setup type
-    // fn deserialize_setup<'de, D>(deserializer: D) -> Result<Option<Arc<Setup>>, D::Error>
-    // where
-    //     D: Deserializer<'de>,
-    // {
-    //     let value = Option::<Setup>::deserialize(deserializer)?;
-    //     Ok(value.map(Arc::new))
-    // }
-
     /// Get playbook version
-    pub fn get_version(&self) -> &Version {
+    pub fn version(&self) -> &Version {
         &self.version
     }
 
     /// Get shared setup config
-    pub fn get_shared_setup(&self) -> Option<Arc<Setup>> {
+    pub fn shared_setup(&self) -> Option<Arc<Setup>> {
         self.setup.as_ref().map(|item| item.clone())
     }
 
     /// Get shared workflows HashMap
-    pub fn get_shared_workflows(&self) -> Arc<HashMap<WorkflowName, WorkflowConfig>> {
+    pub fn shared_workflows(&self) -> Arc<HashMap<WorkflowName, WorkflowConfig>> {
         self.workflows.clone()
     }
 
     /// Get shared jobs HashMap
-    pub fn get_shared_jobs(&self) -> Arc<HashMap<JobName, JobConfig>> {
+    pub fn shared_jobs(&self) -> Arc<HashMap<JobName, JobConfig>> {
         self.jobs.clone()
     }
 }
@@ -161,23 +152,28 @@ mod tests {
         let yaml = r#"
             version: "1"
             jobs:
-                get_uniswap_v2_pair_at_index_0:
+                uniswap_v3_eth_usdc_3000_pool_address:
                     steps:
                       - type: CallContract
-                        name: "Get UniwapV2Pair address from factory at index 0"
+                        name: "Get ETH/USDC 0.3% fee pool address"
                         arguments:
                             chain_rpc_url: "https://eth.llamarpc.com"
-                            contract_address: "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc"
-                            function_signature: "allPairs(uint256)"
+                            contract_address: "0x1F98431c8aD98523631AE4a59f267346ea31F984"
+                            function_signature: "getPool(address,address,uint24)"
                             function_arguments:
-                                - type: uint256
-                                  value: 0
+                                - type: address
+                                  value: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+                                - type: address
+                                  value: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+                                - type: uint24
+                                  value: 3000
+                            function_return_types: [address]
                         output:
-                            save_as: ALL_PAIRS
+                            save_as: ETH_USDC_3000_BPS_POOL_ADDRESS
             workflows:
                 workflow_1:
                     jobs:
-                    - get_uniswap_v2_pair_at_index_0
+                    - uniswap_v3_eth_usdc_3000_pool_address
         "#;
 
         let playbook: Playbook = serde_yaml::from_str(yaml).unwrap();
