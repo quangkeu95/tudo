@@ -7,7 +7,7 @@ pub struct AlloyConverter {}
 impl AlloyConverter {
     /// Convert from alloy [`Address`] into ethers-rs [`H160`]
     pub fn from_alloy_address(address: &Address) -> H160 {
-        let bytes = address.clone().into_array();
+        let bytes = (*address).into_array();
 
         H160::from(bytes)
     }

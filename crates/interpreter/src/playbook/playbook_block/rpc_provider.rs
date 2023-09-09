@@ -122,8 +122,9 @@ impl<'de> Deserialize<'de> for RpcProvider {
 }
 
 #[non_exhaustive]
-#[derive(Debug, Deserialize, strum::Display)]
+#[derive(Debug, Deserialize, Default, strum::Display)]
 pub enum RpcProviderTypes {
+    #[default]
     Http,
     HttpWithBasicAuth,
     HttpWithBearerAuth,
@@ -132,12 +133,6 @@ pub enum RpcProviderTypes {
     WebsocketWithBearerAuth,
     Ipc,
     // Quorum,
-}
-
-impl Default for RpcProviderTypes {
-    fn default() -> Self {
-        RpcProviderTypes::Http
-    }
 }
 
 #[cfg(test)]

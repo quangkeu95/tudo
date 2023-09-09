@@ -20,7 +20,7 @@ pub enum StepArguments {
 impl StepArgumentTrait for StepArguments {
     fn to_step(&self) -> Result<Box<dyn tudo_primitives::Step>, StepArgumentsError> {
         match self {
-            StepArguments::BlankStep => Ok(Box::new(BlankStep::default())),
+            StepArguments::BlankStep => Ok(Box::<BlankStep>::default()),
             StepArguments::CallContract(inner) => inner.to_step(),
         }
     }

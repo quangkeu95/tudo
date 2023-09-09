@@ -54,10 +54,9 @@ impl<'de> Deserialize<'de> for StepConfig {
                     .arguments
                     .ok_or(serde::de::Error::custom("missing field `arguments`"))?;
 
-                let call_contract_arguments = CallContract::deserialize(arguments)
+                CallContract::deserialize(arguments)
                     .map(StepArguments::CallContract)
-                    .map_err(serde::de::Error::custom)?;
-                call_contract_arguments
+                    .map_err(serde::de::Error::custom)?
             }
         };
 
