@@ -4,6 +4,7 @@ use serde::Deserialize;
 use url::Url;
 
 /// RpcProvider supports deserialization from yaml file to construct ethers-rs provider type.
+#[non_exhaustive]
 #[derive(Debug, Clone)]
 pub enum RpcProvider {
     Http(Provider<Http>),
@@ -120,6 +121,7 @@ impl<'de> Deserialize<'de> for RpcProvider {
     }
 }
 
+#[non_exhaustive]
 #[derive(Debug, Deserialize, strum::Display)]
 pub enum RpcProviderTypes {
     Http,

@@ -25,7 +25,7 @@ impl WorkflowExecutor {
         workflow_name: WorkflowName,
         workflow_config: WorkflowConfig,
         playbook_context: SharedMutexPlaybookContext,
-    ) -> Result<WorkflowName, ExecuteWorkflowError> {
+    ) -> Result<WorkflowName, WorkflowExecutorError> {
         info!("Executing workflow {:#?}", workflow_name);
 
         let workflow_context = WorkflowContext::new_share_mutable();
@@ -85,7 +85,7 @@ impl WorkflowExecutor {
         job_config: JobConfig,
         maximum_num_rx: usize,
         workflow_context: SharedMutableWorkflowContext,
-    ) -> Result<JobName, ExecuteWorkflowError> {
+    ) -> Result<JobName, WorkflowExecutorError> {
         let (tx, _rx) = broadcast::channel::<()>(maximum_num_rx);
 
         let dependencies = job_config
@@ -265,7 +265,7 @@ impl WorkflowDAGNode {
 }
 
 #[derive(Debug, Error)]
-pub enum ExecuteWorkflowError {
+pub enum WorkflowExecutorError {
     #[error(transparent)]
     TokioTaskJoinError(#[from] tokio::task::JoinError),
     #[error(transparent)]

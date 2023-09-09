@@ -4,16 +4,16 @@ use thiserror::Error;
 use tudo_config::logging::{__tracing as tracing, error, instrument};
 use tudo_interpreter::playbook::{Playbook, Version};
 
-pub struct Executor {}
+pub struct PlaybookExecutor {}
 
-impl Executor {
+impl PlaybookExecutor {
     /// Execute the playbook and produce outputs.
     /// Workflows in the playbook are executed in parallel, or sequentially by depending on each others.
-    pub async fn run(playbook: Playbook) -> Result<(), ExecutorError> {
+    pub async fn run(playbook: Playbook) -> Result<(), PlaybookExecutorError> {
         match playbook.version() {
             Version::V1 => Self::run_v1(playbook).await,
             #[allow(unreachable_patterns)]
-            other => Err(ExecutorError::PlaybookVersionNotSupported(
+            other => Err(PlaybookExecutorError::PlaybookVersionNotSupported(
                 other.to_string(),
             )),
         }
@@ -21,7 +21,7 @@ impl Executor {
 
     /// Execute the playbook version 1
     #[instrument(name = "PlaybookExecutorV1", skip_all)]
-    async fn run_v1(playbook: Playbook) -> Result<(), ExecutorError> {
+    async fn run_v1(playbook: Playbook) -> Result<(), PlaybookExecutorError> {
         let shared_setup = playbook.shared_setup();
         let playbook_context = PlaybookContextBuilder::default()
             .shared_setup(shared_setup)
@@ -50,7 +50,7 @@ impl Executor {
 }
 
 #[derive(Debug, Error)]
-pub enum ExecutorError {
+pub enum PlaybookExecutorError {
     #[error("playbook version is not supported. Got {:#?}", .0)]
     PlaybookVersionNotSupported(String),
     #[error(transparent)]

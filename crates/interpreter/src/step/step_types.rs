@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Step types that can be used in the playbook definition file
+#[non_exhaustive]
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq, strum::Display)]
 pub enum StepTypes {
     BlankStep,
