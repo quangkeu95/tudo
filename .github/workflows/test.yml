@@ -35,7 +35,7 @@ jobs:
         run: cargo test --locked --all-features --doc
   minimal:
     runs-on: ubuntu-latest
-    name: ubuntu / stable / minimal-versions
+    name: ubuntu / stable 
     steps:
       - uses: actions/checkout@v3
         with:
