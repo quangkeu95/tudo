@@ -60,7 +60,7 @@ impl DynSolTypeWrapper {
             DynSolType::Tuple(vec_param_type) => ParamType::Tuple(
                 vec_param_type
                     .iter()
-                    .map(|item| Self::to_ethers_param_type(item))
+                    .map(Self::to_ethers_param_type)
                     .collect::<Vec<ParamType>>(),
             ),
             DynSolType::CustomStruct {
@@ -68,6 +68,10 @@ impl DynSolTypeWrapper {
                 prop_names: _,
                 tuple: _,
             } => panic!("cannot convert DynSolType::CustomSutrct into ethers ParamType"),
+            #[allow(unreachable_patterns)]
+            _ => {
+                panic!("unsupported DynSolType")
+            }
         }
     }
 

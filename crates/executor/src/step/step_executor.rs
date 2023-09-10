@@ -1,9 +1,7 @@
-// use super::{CallContract, CallContractInputBuilder};
-use ethers::providers::Provider;
 use thiserror::Error;
 use tudo_config::logging::{__tracing as tracing, info, instrument};
-use tudo_interpreter::step::{StepConfig, StepConfigError, StepTypes};
-use tudo_primitives::{Step, StepError};
+use tudo_interpreter::step::{StepConfig, StepConfigError};
+use tudo_primitives::StepError;
 
 use crate::job::{JobContext, JobContextError};
 

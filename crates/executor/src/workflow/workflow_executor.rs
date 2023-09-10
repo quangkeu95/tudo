@@ -160,8 +160,8 @@ impl WorkflowDAG {
         } else if !self.job_to_node_index.contains_key(to) {
             return Err(WorkflowDAGError::NodeNotExisted(to.clone()));
         }
-        let from_index = self.job_to_node_index.get(from).unwrap().clone();
-        let to_index = self.job_to_node_index.get(to).unwrap().clone();
+        let from_index = *self.job_to_node_index.get(from).unwrap();
+        let to_index = *self.job_to_node_index.get(to).unwrap();
 
         let edge_index = self
             .dag
@@ -199,7 +199,7 @@ impl WorkflowDAG {
             .for_each(|(_job_name, node_index)| {
                 let index = node_index.index();
 
-                if visited[index] == false {
+                if !visited[index] {
                     i = Self::dfs(self, i, index, &mut visited, &mut ordering)
                 }
             });
@@ -221,8 +221,8 @@ impl WorkflowDAG {
             .map(|(_, n_index)| n_index)
         {
             let child_node_index = child_node_index.index();
-            if visited[child_node_index] == false {
-                i = Self::dfs(&self, i, child_node_index, visited, ordering);
+            if !visited[child_node_index] {
+                i = Self::dfs(self, i, child_node_index, visited, ordering);
             }
         }
 

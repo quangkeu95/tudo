@@ -1,11 +1,11 @@
 [package]
 name = "tudo-executor"
-version.workspace = true
-edition.workspace = true
-rust-version.workspace = true
-license.workspace = true
-homepage.workspace = true
-repository.workspace = true
+version = "0.1.0"
+edition = "2021"
+authors = ["Quang Nguyen <quangkeu95@gmail.com>"]
+license = "MIT OR Apache-2.0"
+homepage = "https://github.com/quangkeu95/tudo"
+repository = "https://github.com/quangkeu95/tudo"
 
 [dependencies]
 # internal

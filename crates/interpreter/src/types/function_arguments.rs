@@ -62,7 +62,7 @@ impl FunctionArgument {
     ) -> Result<ethers::abi::Token, FunctionArgumentError> {
         match solidity_value {
             DynSolValue::Address(address) => Ok(ethers::abi::Token::Address(
-                AlloyConverter::from_alloy_address(&address),
+                AlloyConverter::from_alloy_address(address),
             )),
             DynSolValue::Bool(value) => Ok(ethers::abi::Token::Bool(*value)),
             DynSolValue::Int(value, size) => {
@@ -77,7 +77,7 @@ impl FunctionArgument {
                 AlloyConverter::from_alloy_uint(value, *size),
             )),
             DynSolValue::FixedBytes(value, _size) => Ok(ethers::abi::Token::FixedBytes(
-                AlloyConverter::from_alloy_fixed_bytes(&value).to_vec(),
+                AlloyConverter::from_alloy_fixed_bytes(value).to_vec(),
             )),
             DynSolValue::Bytes(value) => Ok(ethers::abi::Token::Bytes(
                 AlloyConverter::from_alloy_bytes(&Bytes::from(value.clone())).to_vec(),
@@ -86,24 +86,24 @@ impl FunctionArgument {
             DynSolValue::Array(value_array) => {
                 let converted_array: Result<Vec<ethers::abi::Token>, FunctionArgumentError> =
                     value_array
-                        .into_iter()
-                        .map(|item| Self::dyn_sol_value_to_ethers_abi_token(item))
+                        .iter()
+                        .map(Self::dyn_sol_value_to_ethers_abi_token)
                         .collect();
                 Ok(ethers::abi::Token::Array(converted_array?))
             }
             DynSolValue::FixedArray(value_array) => {
                 let converted_array: Result<Vec<ethers::abi::Token>, FunctionArgumentError> =
                     value_array
-                        .into_iter()
-                        .map(|item| Self::dyn_sol_value_to_ethers_abi_token(item))
+                        .iter()
+                        .map(Self::dyn_sol_value_to_ethers_abi_token)
                         .collect();
                 Ok(ethers::abi::Token::FixedArray(converted_array?))
             }
             DynSolValue::Tuple(value_tuple) => {
                 let converted_array: Result<Vec<ethers::abi::Token>, FunctionArgumentError> =
                     value_tuple
-                        .into_iter()
-                        .map(|item| Self::dyn_sol_value_to_ethers_abi_token(item))
+                        .iter()
+                        .map(Self::dyn_sol_value_to_ethers_abi_token)
                         .collect();
                 Ok(ethers::abi::Token::Tuple(converted_array?))
             }
@@ -114,6 +114,10 @@ impl FunctionArgument {
             } => Err(FunctionArgumentError::NotSupportedType(
                 custom_struct.clone(),
             )),
+            #[allow(unreachable_patterns)]
+            _ => {
+                panic!("unsupported DynSolValue");
+            }
         }
     }
 

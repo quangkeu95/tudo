@@ -4,18 +4,12 @@ use thiserror::Error;
 use tudo_interpreter::step::StepName;
 use tudo_primitives::StepOutput;
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct JobContext {
     step_outputs: HashMap<StepName, StepOutput>,
 }
 
 impl JobContext {
-    pub fn new() -> Self {
-        Self {
-            step_outputs: HashMap::new(),
-        }
-    }
-
     /// Add step output to job context
     pub fn add_step_output(
         &mut self,

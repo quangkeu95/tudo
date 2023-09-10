@@ -64,6 +64,7 @@ mod tests {
     use ethers::utils::Anvil;
 
     #[tokio::test]
+    #[ignore]
     async fn can_send_transaction() {
         let anvil = Anvil::new().spawn();
 

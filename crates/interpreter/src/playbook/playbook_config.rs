@@ -36,7 +36,7 @@ impl TryFrom<PlaybookDeserializeHelper> for Playbook {
                 .map(|item| match item {
                     JobConfigInWorkflowEnum::JobName(job_name) => {
                         let job_config = jobs
-                            .get(&job_name)
+                            .get(job_name)
                             .ok_or(PlaybookDeserializeHelperError::JobNotDefined(
                                 job_name.clone(),
                             ))?
@@ -54,9 +54,9 @@ impl TryFrom<PlaybookDeserializeHelper> for Playbook {
                             ))?
                             .clone();
 
-                        job_config.with_job_config_helper(&job_config_helper);
+                        job_config.with_job_config_helper(job_config_helper);
 
-                        Ok((job_name.clone(), job_config))
+                        Ok((job_name, job_config))
                     }
                 })
                 .collect::<Result<HashMap<JobName, JobConfig>, Self::Error>>()?;
@@ -119,7 +119,7 @@ impl Playbook {
 
     /// Get shared setup config
     pub fn shared_setup(&self) -> Option<Arc<Setup>> {
-        self.setup.as_ref().map(|item| item.clone())
+        self.setup.as_ref().cloned()
     }
 
     /// Get shared workflows HashMap

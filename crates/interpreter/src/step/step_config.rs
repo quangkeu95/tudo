@@ -54,10 +54,9 @@ impl<'de> Deserialize<'de> for StepConfig {
                     .arguments
                     .ok_or(serde::de::Error::custom("missing field `arguments`"))?;
 
-                let call_contract_arguments = CallContract::deserialize(arguments)
+                CallContract::deserialize(arguments)
                     .map(StepArguments::CallContract)
-                    .map_err(serde::de::Error::custom)?;
-                call_contract_arguments
+                    .map_err(serde::de::Error::custom)?
             }
         };
 
@@ -106,12 +105,12 @@ mod tests {
                 function_arguments:
                     - type: address
                       value: "0x95Ba4cF87D6723ad9C0Db21737D862bE80e93911"
-                function_return_types: uint256
+                function_return_types: [uint256]
             output:
                 save_as: BALANCE_OF_0x95Ba4cF87D6723ad9C0Db21737D862bE80e93911
         "#;
 
-        let step_configs: StepConfig = serde_yaml::from_str(content).unwrap();
+        let _step_configs: StepConfig = serde_yaml::from_str(content).unwrap();
     }
 
     #[test]

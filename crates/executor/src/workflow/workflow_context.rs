@@ -7,6 +7,7 @@ use tudo_interpreter::job::JobName;
 
 use crate::job::JobContext;
 
+#[derive(Default)]
 pub struct WorkflowContext {
     job_contexts: HashMap<JobName, JobContext>,
     pending_jobs: HashMap<JobName, Sender<()>>,
@@ -16,14 +17,7 @@ pub type SharedMutableWorkflowContext = Arc<Mutex<WorkflowContext>>;
 
 impl WorkflowContext {
     pub fn new_share_mutable() -> SharedMutableWorkflowContext {
-        Arc::new(Mutex::new(WorkflowContext::new()))
-    }
-
-    pub fn new() -> Self {
-        Self {
-            job_contexts: HashMap::new(),
-            pending_jobs: HashMap::new(),
-        }
+        Arc::new(Mutex::new(WorkflowContext::default()))
     }
 
     pub fn add_job_context(

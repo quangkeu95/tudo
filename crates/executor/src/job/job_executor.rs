@@ -17,7 +17,7 @@ impl JobExecutor {
     ) -> Result<JobContext, ExecuteJobError> {
         info!("Executing job {:#?}", job_name);
 
-        let mut job_context = JobContext::new();
+        let mut job_context = JobContext::default();
 
         for step in job_config.steps() {
             StepExecutor::execute(step, &mut job_context).await?;

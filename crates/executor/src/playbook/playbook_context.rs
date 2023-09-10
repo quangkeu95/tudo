@@ -5,8 +5,10 @@ use futures::lock::Mutex;
 use tudo_interpreter::playbook::Setup;
 
 /// Playbook context, could be shared with the whole playbook by using [`SharedMutexPlaybookContext`]
+#[allow(dead_code)]
 #[derive(Debug, Builder)]
 pub struct PlaybookContext {
+    #[builder(default)]
     shared_setup: Option<Arc<Setup>>,
 }
 
