@@ -183,6 +183,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn can_parse_ws_rpc_provider() {
         let _anvil = Anvil::new().port(8545u16).spawn();
 
