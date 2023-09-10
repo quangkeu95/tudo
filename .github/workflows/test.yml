@@ -92,7 +92,9 @@ jobs:
         run: cargo generate-lockfile
       - name: cargo llvm-cov
         run: cargo llvm-cov --locked --all-features --lcov --output-path lcov.info
-      # - name: Upload to codecov.io
-        # uses: codecov/codecov-action@v3
-        # with:
-          # fail_ci_if_error: true
+      - name: Upload to codecov.io
+        uses: codecov/codecov-action@v3
+        env:
+            CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          fail_ci_if_error: true
