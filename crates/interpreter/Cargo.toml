@@ -20,7 +20,7 @@ alloy-dyn-abi = { version = "0.3", features = ["arbitrary", "eip712"] }
 serde = { workspace = true, features = ["rc"] }
 serde_json = { workspace = true }
 serde_yaml = "0.9.25"
-serde-enum-str = "0.3"
+serde-enum-str = "0.4"
 
 # misc
 eyre = { workspace = true }
