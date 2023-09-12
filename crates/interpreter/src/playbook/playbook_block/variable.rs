@@ -30,6 +30,11 @@ impl<'de> Deserialize<'de> for Variable {
             variable_str = variable_str.replace(env_var_name, env_value);
         }
 
+        variable_str = variable_str
+            .replace(r#"\$"#, "$")
+            .replace(r#"\{"#, "{")
+            .replace(r#"\}"#, "}");
+
         Ok(Self(variable_str))
     }
 }
@@ -44,8 +49,9 @@ mod test {
         env::set_var("KEY_ONE", "VALUE_1");
         env::set_var("KEY_$_2", "VALUE_2");
 
-        let yaml = r#"i wanna read env vars ${KEY_ONE} and ${KEY_$_2}, not \$KEY_3 or \$KEY_4"#;
-        let expected = r#"i wanna read env vars VALUE_1 and VALUE_2, not \$KEY_3 or \$KEY_4"#;
+        let yaml =
+            r#"i wanna read env vars ${KEY_ONE} and ${KEY_$_2}, not \$\{KEY_3\} or \$\{KEY_4\}"#;
+        let expected = r#"i wanna read env vars VALUE_1 and VALUE_2, not ${KEY_3} or ${KEY_4}"#;
 
         let actual: Variable = serde_yaml::from_str(yaml).unwrap();
 
