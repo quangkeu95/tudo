@@ -1,18 +1,24 @@
 version: "1"
+setup:
+    variables:
+        ETH_RPC_URL: https://eth.llamarpc.com
+        UNISWAP_V3_FACTORY: "0x1F98431c8aD98523631AE4a59f267346ea31F984"
+        WETH_ADDRESS: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+        USDC_ADDRESS: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
 jobs:
     uniswap_v3_eth_usdc_3000_pool_address:
         steps:
           - type: CallContract
             name: "Get ETH/USDC 0.3% fee pool address"
             arguments:
-                chain_rpc_url: "https://eth.llamarpc.com"
-                contract_address: "0x1F98431c8aD98523631AE4a59f267346ea31F984"
+                chain_rpc_url: {{ETH_RPC_URL}}
+                contract_address: {{UNISWAP_V3_FACTORY}}
                 function_signature: "getPool(address,address,uint24)"
                 function_arguments:
                     - type: address
-                      value: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+                      value: {{WETH_ADDRESS}}
                     - type: address
-                      value: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+                      value: {{USDC_ADDRESS}}
                     - type: uint24
                       value: 3000
                 function_return_types: [address]

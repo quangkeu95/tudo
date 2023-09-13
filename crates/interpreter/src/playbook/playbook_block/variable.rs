@@ -1,7 +1,7 @@
 use derive_more::Into;
 use lazy_static::lazy_static;
 use regex::Regex;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 lazy_static! {
@@ -9,7 +9,7 @@ lazy_static! {
 }
 
 /// A Variable that value is a String and can contains environment variables in format `${ENV_VAR}`
-#[derive(Debug, Into)]
+#[derive(Debug, Serialize, Into)]
 pub struct Variable(String);
 
 impl<'de> Deserialize<'de> for Variable {
