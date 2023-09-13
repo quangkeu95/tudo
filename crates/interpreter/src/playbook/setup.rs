@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, str::FromStr};
 
 use serde::Deserialize;
 
@@ -11,6 +11,22 @@ use super::{RpcProvider, Variable};
 pub struct Setup {
     pub variables: Option<HashMap<VariableName, Variable>>,
     pub rpc_providers: Option<HashMap<VariableName, RpcProvider>>,
+}
+
+impl Setup {
+    /// Get variable value by it's name. Return None if the variable is not defined.
+    pub fn get_variable<N>(&self, variable_name: N) -> Option<&Variable>
+    where
+        N: AsRef<str>,
+    {
+        if let Some(variables) = &self.variables {
+            let variable_name = VariableName::from_str(variable_name.as_ref()).ok()?;
+
+            variables.get(&variable_name)
+        } else {
+            None
+        }
+    }
 }
 
 #[cfg(test)]

@@ -6,6 +6,7 @@ use crate::{
     },
 };
 use derive_builder::Builder;
+use handlebars::Handlebars;
 use serde::Deserialize;
 use std::{collections::HashMap, fs::File, io::Read, path::Path, sync::Arc};
 use thiserror::Error;
@@ -107,9 +108,41 @@ impl Playbook {
         let mut file = File::open(file_path)?;
         let mut content = String::new();
         file.read_to_string(&mut content)?;
+
+        // preprocess
+        let content = Self::preprocess(&content)?;
+
         let playbook: Playbook = serde_yaml::from_str(&content)?;
 
         Ok(playbook)
+    }
+
+    /// Preprocess will replace variable references with handlebars syntax with pre-defined variables in the config setup
+    fn preprocess<S>(content: S) -> Result<String, PlaybookError>
+    where
+        S: AsRef<str>,
+    {
+        let content = content.as_ref();
+
+        #[derive(Debug, Deserialize)]
+        struct SetupHelper {
+            setup: Option<Setup>,
+        }
+        let helper: SetupHelper = serde_yaml::from_str(content)?;
+        dbg!(&helper);
+        if let Some(setup) = helper.setup {
+            let mut handlebars = Handlebars::new();
+
+            handlebars.set_strict_mode(true);
+
+            if let Some(variables) = &setup.variables {
+                handlebars.register_template_string("variables", content)?;
+                let rendered = handlebars.render("variables", variables)?;
+                return Ok(rendered);
+            }
+        }
+
+        Ok(content.to_string())
     }
 
     /// Get playbook version
@@ -139,6 +172,10 @@ pub enum PlaybookError {
     IoError(#[from] std::io::Error),
     #[error(transparent)]
     SerdeYamlError(#[from] serde_yaml::Error),
+    #[error(transparent)]
+    HandlebarsTemplateError(#[from] handlebars::TemplateError),
+    #[error(transparent)]
+    HandlebarsRenderError(#[from] handlebars::RenderError),
 }
 
 #[cfg(test)]
@@ -178,5 +215,43 @@ mod tests {
 
         let playbook: Playbook = serde_yaml::from_str(yaml).unwrap();
         assert_matches!(playbook.version, Version::V1);
+    }
+
+    #[test]
+    fn can_preprocess_playbook() {
+        let yaml = r#"
+            version: "1"
+            setup:
+                variables:
+                    ETH_RPC_URL: https://eth.llamarpc.com
+                    UNISWAP_V3_FACTORY: "0x1F98431c8aD98523631AE4a59f267346ea31F984"
+                    WETH_ADDRESS: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+                    USDC_ADDRESS: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+            jobs:
+                uniswap_v3_eth_usdc_3000_pool_address:
+                    steps:
+                      - type: CallContract
+                        name: "Get ETH/USDC 0.3% fee pool address"
+                        arguments:
+                            chain_rpc_url: {{ETH_RPC_URL}}
+                            contract_address: {{UNISWAP_V3_FACTORY}}
+                            function_signature: "getPool(address,address,uint24)"
+                            function_arguments:
+                                - type: address
+                                  value: {{WETH_ADDRESS}}
+                                - type: address
+                                  value: {{USDC_ADDRESS}}
+                                - type: uint24
+                                  value: 3000
+                            function_return_types: [address]
+                        output:
+                            save_as: ETH_USDC_3000_BPS_POOL_ADDRESS
+            workflows:
+                workflow_1:
+                    jobs:
+                    - uniswap_v3_eth_usdc_3000_pool_address
+        "#;
+
+        let _processed_content = Playbook::preprocess(yaml).unwrap();
     }
 }
