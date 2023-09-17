@@ -1,5 +1,5 @@
 use super::StepArgumentsError;
-use tudo_primitives::Step;
+use shared::Step;
 
 /// A StepArgument can turn into a [`Step`]
 pub trait StepArgumentTrait {

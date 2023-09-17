@@ -2,8 +2,8 @@ mod call_contract;
 pub use call_contract::*;
 
 use serde::Deserialize;
+use shared::{BlankStep, CallContractBuilderError, Step};
 use thiserror::Error;
-use tudo_primitives::{BlankStep, CallContractBuilderError};
 
 use crate::types::FunctionArgumentError;
 
@@ -18,7 +18,7 @@ pub enum StepArguments {
 }
 
 impl StepArgumentTrait for StepArguments {
-    fn to_step(&self) -> Result<Box<dyn tudo_primitives::Step>, StepArgumentsError> {
+    fn to_step(&self) -> Result<Box<dyn Step>, StepArgumentsError> {
         match self {
             StepArguments::BlankStep => Ok(Box::<BlankStep>::default()),
             StepArguments::CallContract(inner) => inner.to_step(),

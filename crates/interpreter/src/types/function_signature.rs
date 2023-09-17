@@ -6,7 +6,7 @@ use serde::Deserialize;
 ///
 /// # Example
 /// ```rust
-/// use tudo_interpreter::types::FunctionSignature;
+/// use interpreter::types::FunctionSignature;
 /// use ethers::types::Bytes;
 /// use std::str::FromStr;
 ///

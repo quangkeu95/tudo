@@ -1,5 +1,5 @@
 [package]
-name = "tudo-primitives"
+name = "shared"
 version = "0.1.0"
 edition = "2021"
 authors = ["Quang Nguyen <quangkeu95@gmail.com>"]

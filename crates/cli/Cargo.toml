@@ -1,5 +1,5 @@
 [package]
-name = "tudo-cli"
+name = "cli"
 version = "0.1.0"
 edition = "2021"
 authors = ["Quang Nguyen <quangkeu95@gmail.com>"]
@@ -16,9 +16,9 @@ vergen = { version = "8", default-features = false, features = ["build", "git", 
 
 [dependencies]
 #internal
-tudo-config = { workspace = true }
-tudo-interpreter = { workspace = true }
-tudo-executor = { workspace = true }
+config = { workspace = true }
+interpreter = { workspace = true }
+executor = { workspace = true }
 
 #cli
 clap = { version = "4", features = ["derive", "env", "cargo", "unicode", "wrap_help"] }

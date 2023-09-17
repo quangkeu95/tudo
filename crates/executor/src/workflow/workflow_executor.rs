@@ -4,9 +4,9 @@ use daggy::{Dag, EdgeIndex, NodeIndex, Walker};
 use futures::stream::StreamExt;
 use thiserror::Error;
 use tokio::sync::broadcast;
-use tudo_config::logging::{__tracing as tracing, error, info, instrument};
-use tudo_interpreter::job::JobConfig;
-use tudo_interpreter::{
+use config::logging::{__tracing as tracing, error, info, instrument};
+use interpreter::job::JobConfig;
+use interpreter::{
     job::JobName,
     workflow::{WorkflowConfig, WorkflowName},
 };
@@ -281,7 +281,7 @@ mod tests {
     use std::str::FromStr;
 
     use crate::playbook::PlaybookContextBuilder;
-    use tudo_interpreter::{job::JobConfigBuilder, workflow::WorkflowConfigBuilder};
+    use interpreter::{job::JobConfigBuilder, workflow::WorkflowConfigBuilder};
 
     use super::*;
 

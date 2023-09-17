@@ -1,8 +1,8 @@
 use super::{PlaybookContextBuilder, PlaybookContextBuilderError};
 use crate::workflow::WorkflowExecutor;
 use thiserror::Error;
-use tudo_config::logging::{__tracing as tracing, error, instrument};
-use tudo_interpreter::playbook::{Playbook, Version};
+use config::logging::{__tracing as tracing, error, instrument};
+use interpreter::playbook::{Playbook, Version};
 
 pub struct PlaybookExecutor {}
 

@@ -3,7 +3,7 @@ use std::{collections::HashMap, sync::Arc};
 use futures::lock::Mutex;
 use thiserror::Error;
 use tokio::sync::broadcast::{Receiver, Sender};
-use tudo_interpreter::job::JobName;
+use interpreter::job::JobName;
 
 use crate::job::JobContext;
 
