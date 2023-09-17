@@ -4,7 +4,7 @@ use ethers::{
     types::{BlockId, Bytes},
 };
 use serde::Deserialize;
-use tudo_primitives::{utils::build_calldata, CallContractBuilder};
+use shared::{utils::build_calldata, CallContractBuilder, Step};
 
 use crate::{
     alloy_converter::AlloyConverter,
@@ -60,7 +60,7 @@ impl CallContract {
 }
 
 impl StepArgumentTrait for CallContract {
-    fn to_step(&self) -> Result<Box<dyn tudo_primitives::Step>, super::StepArgumentsError> {
+    fn to_step(&self) -> Result<Box<dyn Step>, super::StepArgumentsError> {
         let contract_address = AlloyConverter::from_alloy_address(&self.contract_address);
         let calldata = self.calldata()?;
         let return_data_types = self.as_function_return_param_types();

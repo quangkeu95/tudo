@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
+use interpreter::step::StepName;
+use shared::StepOutput;
 use thiserror::Error;
-use tudo_interpreter::step::StepName;
-use tudo_primitives::StepOutput;
 
 #[derive(Clone, Default)]
 pub struct JobContext {

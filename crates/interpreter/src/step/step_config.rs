@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use serde_valid::Validate;
+use shared::Step;
 use thiserror::Error;
-use tudo_primitives::Step;
 
 use crate::step::CallContract;
 

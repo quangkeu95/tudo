@@ -3,9 +3,9 @@ use clap::Parser;
 use owo_colors::OwoColorize;
 use serde::Serialize;
 use std::path::PathBuf;
-use tudo_config::logging::{__tracing as tracing, info, instrument};
-use tudo_executor::playbook::PlaybookExecutor;
-use tudo_interpreter::playbook::Playbook;
+use config::logging::{__tracing as tracing, info, instrument};
+use executor::playbook::PlaybookExecutor;
+use interpreter::playbook::Playbook;
 
 use crate::cmd::utils::AsyncCmd;
 

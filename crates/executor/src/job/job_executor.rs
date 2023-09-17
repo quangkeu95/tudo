@@ -1,6 +1,6 @@
 use thiserror::Error;
-use tudo_config::logging::{__tracing as tracing, info, instrument};
-use tudo_interpreter::job::{JobConfig, JobName};
+use config::logging::{__tracing as tracing, info, instrument};
+use interpreter::job::{JobConfig, JobName};
 
 use crate::{
     job::JobContext,

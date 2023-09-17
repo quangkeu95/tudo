@@ -1,5 +1,5 @@
 [package]
-name = "tudo-interpreter"
+name = "interpreter"
 version = "0.1.0"
 edition = "2021"
 authors = ["Quang Nguyen <quangkeu95@gmail.com>"]
@@ -9,7 +9,7 @@ repository = "https://github.com/quangkeu95/tudo"
 
 [dependencies]
 # internal
-tudo-primitives = { workspace = true }
+shared = { workspace = true }
 ethers = { workspace = true }
 
 alloy-sol-types = { version = "0.3" }

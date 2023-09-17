@@ -1,7 +1,7 @@
 use thiserror::Error;
-use tudo_config::logging::{__tracing as tracing, info, instrument};
-use tudo_interpreter::step::{StepConfig, StepConfigError};
-use tudo_primitives::StepError;
+use config::logging::{__tracing as tracing, info, instrument};
+use interpreter::step::{StepConfig, StepConfigError};
+use shared::StepError;
 
 use crate::job::{JobContext, JobContextError};
 

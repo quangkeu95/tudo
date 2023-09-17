@@ -1,10 +1,10 @@
 use clap::Parser;
-use tudo_cli::{
+use cli::{
     cli::tudo::{Cli, Subcommands},
     cmd::utils::AsyncCmd,
     utils,
 };
-use tudo_config::logging::{info, init_tracing_subscriber};
+use config::logging::{info, init_tracing_subscriber};
 
 #[tokio::main]
 async fn main() -> eyre::Result<()> {

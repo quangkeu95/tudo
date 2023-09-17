@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use derive_builder::Builder;
 use futures::lock::Mutex;
-use tudo_interpreter::playbook::Setup;
+use interpreter::playbook::Setup;
 
 /// Playbook context, could be shared with the whole playbook by using [`SharedMutexPlaybookContext`]
 #[allow(dead_code)]

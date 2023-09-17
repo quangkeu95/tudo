@@ -5,7 +5,7 @@ use ethers::types::Bytes;
 ///
 /// # Example
 /// ```rust
-/// use tudo_primitives::utils::*;
+/// use shared::utils::*;
 /// use ethers::abi::Token;
 /// use ethers::types::{Bytes, H160, U256};
 /// use std::str::FromStr;
