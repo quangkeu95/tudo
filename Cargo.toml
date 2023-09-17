@@ -19,11 +19,11 @@ rustdoc-args = ["--cfg", "docsrs"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [workspace.dependencies]
-tudo-interpreter = { version = "0.1.0", path = "crates/interpreter" }
-tudo-cli = { version = "0.1.0", path = "crates/cli"}
-tudo-config = { version = "0.1.0", path = "crates/config"}
-tudo-primitives = { version = "0.1.0", path = "crates/primitives"}
-tudo-executor = { version = "0.1.0", path = "crates/executor"}
+interpreter = { version = "0.1.0", path = "crates/interpreter" }
+cli = { version = "0.1.0", path = "crates/cli"}
+config = { version = "0.1.0", path = "crates/config"}
+shared = { version = "0.1.0", path = "crates/shared"}
+executor = { version = "0.1.0", path = "crates/executor"}
 
 ethers = { git = "https://github.com/gakonst/ethers-rs", features = ["ws", "ipc"]}
 
