@@ -1,0 +1,22 @@
+[package]
+name = "collectors"
+version = "0.1.0"
+edition = "2021"
+authors = ["Quang Nguyen <quangkeu95@gmail.com>"]
+license = "MIT OR Apache-2.0"
+homepage = "https://github.com/quangkeu95/tudo"
+repository = "https://github.com/quangkeu95/tudo"
+description = """
+Collectors binary and library
+"""
+
+[[bin]]
+name = "tudo-collectors"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = {workspace = true }
+tokio = { workspace = true, features = ["rt-multi-thread"]}
+tracing = { workspace = true}
+tracing-subscriber = { workspace = true }
+
