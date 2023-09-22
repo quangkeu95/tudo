@@ -23,5 +23,7 @@ anyhow = {workspace = true }
 tokio = { workspace = true, features = ["rt-multi-thread"]}
 tracing = { workspace = true}
 tracing-subscriber = { workspace = true }
+ethers = { workspace = true}
 
+amms = "0.6.1"
 clap = { version = "4", features = ["derive", "env"], optional = true }
