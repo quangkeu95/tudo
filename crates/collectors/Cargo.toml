@@ -14,9 +14,14 @@ Collectors binary and library
 name = "tudo-collectors"
 path = "src/main.rs"
 
+[features]
+default = ["cli"]
+cli = ["dep:clap"]
+
 [dependencies]
 anyhow = {workspace = true }
 tokio = { workspace = true, features = ["rt-multi-thread"]}
 tracing = { workspace = true}
 tracing-subscriber = { workspace = true }
 
+clap = { version = "4", features = ["derive", "env"], optional = true }

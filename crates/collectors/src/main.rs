@@ -1,6 +1,8 @@
 use anyhow::Result;
+use collectors::cli;
 
+#[cfg(feature = "cli")]
 #[tokio::main]
 async fn main() -> Result<()> {
-    collectors::run().await
+    cli::run().await
 }
