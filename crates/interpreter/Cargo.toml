@@ -12,7 +12,7 @@ repository = "https://github.com/quangkeu95/tudo"
 shared = { workspace = true }
 ethers = { workspace = true }
 
-alloy-sol-types = { version = "0.3" }
+alloy-sol-types = { version = "0.5" }
 alloy-primitives = { version = "0.3" }
 alloy-dyn-abi = { version = "0.3", features = ["arbitrary", "eip712"] }
 
